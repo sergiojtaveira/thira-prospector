@@ -394,7 +394,7 @@ function renderResults(filter) {
 async function runSearch() {
   var businessType=document.getElementById('businessType').value.trim();
   var location=document.getElementById('location').value.trim();
-  var apiKey=document.getElementById('apiKey').value.trim();
+  var apiKey='configured';
   var btn=document.getElementById('searchBtn');
   var errorBox=document.getElementById('errorBox');
   errorBox.style.display='none';
@@ -406,7 +406,7 @@ async function runSearch() {
   document.getElementById('resultsArea').innerHTML='<div class="state-box"><div class="spinner"></div><div class="state-title">Searching Google Maps...</div><div class="state-desc">Finding '+businessType+'s in '+location+'...</div></div>';
   try {
     var q=encodeURIComponent(businessType+' in '+location+', UK');
-    var url='/search?q='+q+'&key='+encodeURIComponent(apiKey);
+    var url='/search?q='+q;
     var res=await fetch(url);
     var data=await res.json();
     if(data.error) throw new Error(data.error);
