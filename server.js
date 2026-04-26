@@ -7,11 +7,11 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Proxy route for SerpApi
 app.get('/search', async (req, res) => {
-  const { q, key } = req.query;
-  if (!q || !key) return res.status(400).json({ error: 'Missing query or key' });
-
+  const { q } = req.query;
+  const key = process.env.SERPAPI_KEY;
+  if (!q) return res.status(400).json({ error: 'Missing query' });
+  if (!key) return res.status(500).json({ error: 'SerpApi key not configured' });
   try {
     const url = `https://serpapi.com/search.json?engine=google_maps&q=${encodeURIComponent(q)}&api_key=${key}&type=search&hl=en&gl=uk`;
     const response = await fetch(url);
@@ -22,6 +22,4 @@ app.get('/search', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Thira Prospector running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Thira Prospector running on port ${PORT}`));
