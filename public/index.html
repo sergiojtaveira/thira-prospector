@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thira Prospector</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --teal: #7ecfad; --teal-light: #9edfc0; --teal-dim: rgba(126,207,173,0.12);
+    --bg: #0d1f1a; --bg-mid: #122b24; --bg-card: #0f2520;
+    --text: #e8f0ec; --text-muted: rgba(232,240,236,0.55); --text-faint: rgba(232,240,236,0.28);
+    --border: rgba(255,255,255,0.07); --border-teal: rgba(126,207,173,0.22);
+    --red: #f87171; --amber: #fbbf24;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2rem; border-bottom: 0.5px solid var(--border); background: rgba(13,31,26,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 50; }
+  .logo { font-size: 18px; font-weight: 500; color: var(--teal); letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; color: var(--text-faint); letter-spacing: 1.5px; text-transform: uppercase; margin-left: 0.75rem; }
+  .header-badge { font-size: 11px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--teal); border: 0.5px solid var(--border-teal); padding: 0.3rem 0.8rem; border-radius: 100px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+  .main-tabs { display: flex; gap: 0; margin-bottom: 2rem; border-bottom: 0.5px solid var(--border); }
+  .main-tab { font-size: 13px; font-weight: 500; padding: 0.75rem 1.5rem; cursor: pointer; background: transparent; color: var(--text-muted); border: none; font-family: 'DM Sans', sans-serif; border-bottom: 2px solid transparent; transition: all 0.2s; position: relative; bottom: -0.5px; }
+  .main-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+  .main-tab:hover:not(.active) { color: var(--text); }
+  .tab-count { font-size: 10px; background: var(--teal-dim); color: var(--teal); border-radius: 100px; padding: 0.1rem 0.5rem; margin-left: 0.4rem; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .search-panel { background: var(--bg-mid); border: 0.5px solid var(--border-teal); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; }
+  .panel-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); margin-bottom: 0.4rem; letter-spacing: -0.3px; }
+  .panel-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 1.75rem; font-weight: 300; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.75rem; align-items: end; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  label { font-size: 11px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(126,207,173,0.6); }
+  input { background: var(--bg); border: 0.5px solid var(--border); border-radius: 8px; padding: 0.7rem 1rem; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; transition: border-color 0.2s; width: 100%; }
+  input::placeholder { color: var(--text-faint); }
+  input:focus { border-color: var(--border-teal); }
+  .search-btn { background: var(--teal); color: var(--bg); border: none; border-radius: 8px; padding: 0.7rem 1.75rem; font-size: 14px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.2s, transform 0.15s; white-space: nowrap; }
+  .search-btn:hover { background: var(--teal-light); transform: translateY(-1px); }
+  .search-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .api-section { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 0.5px solid var(--border); }
+  .api-note { font-size: 12px; color: var(--text-faint); margin-top: 0.5rem; line-height: 1.6; }
+  .quick-picks { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+  .quick-label { font-size: 11px; color: var(--text-faint); letter-spacing: 1px; text-transform: uppercase; }
+  .quick-pill { font-size: 12px; color: var(--text-muted); border: 0.5px solid var(--border); border-radius: 100px; padding: 0.25rem 0.75rem; cursor: pointer; transition: all 0.15s; background: transparent; font-family: 'DM Sans', sans-serif; }
+  .quick-pill:hover { border-color: var(--border-teal); color: var(--teal); background: var(--teal-dim); }
+  .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
+  .stat-cell { background: var(--bg-card); padding: 1rem 1.25rem; text-align: center; }
+  .stat-num { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--text); line-height: 1; margin-bottom: 0.2rem; }
+  .stat-num.green { color: var(--teal); }
+  .stat-num.amber { color: var(--amber); }
+  .stat-label { font-size: 11px; color: var(--text-faint); letter-spacing: 1px; text-transform: uppercase; }
+  .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem; }
+  .results-title { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+  .action-btn { font-size: 12px; font-weight: 500; color: var(--teal); border: 0.5px solid var(--border-teal); border-radius: 100px; padding: 0.35rem 1rem; cursor: pointer; background: transparent; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .action-btn:hover { background: var(--teal-dim); }
+  .filter-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .filter-tab { font-size: 12px; font-weight: 500; padding: 0.4rem 1rem; border-radius: 100px; border: 0.5px solid var(--border); cursor: pointer; background: transparent; color: var(--text-muted); font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .filter-tab.active { background: var(--teal-dim); border-color: var(--border-teal); color: var(--teal); }
+  .filter-tab:hover:not(.active) { border-color: var(--border-teal); color: var(--text); }
+  .results-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+  .result-card { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.1rem 1.5rem; display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; transition: border-color 0.2s, background 0.2s; animation: slideIn 0.3s ease both; }
+  .result-card:hover { border-color: var(--border-teal); background: var(--bg-mid); }
+  .result-card.no-website { border-left: 2px solid var(--teal); }
+  .result-card.bad-website { border-left: 2px solid var(--amber); }
+  .result-card.has-website { border-left: 2px solid rgba(255,255,255,0.08); opacity: 0.55; }
+  .result-name a { color: var(--text); text-decoration: none; font-size: 14px; font-weight: 500; }
+  .result-name a:hover { color: var(--teal); }
+  .result-meta { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-top: 0.2rem; }
+  .result-meta-item { font-size: 12px; color: var(--text-faint); }
+  .result-address { font-size: 12px; color: var(--text-muted); margin-top: 0.15rem; }
+  .stars { color: var(--amber); font-size: 11px; }
+  .result-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }
+  .badge { font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 0.25rem 0.65rem; border-radius: 100px; white-space: nowrap; }
+  .badge.no-website { background: rgba(126,207,173,0.12); color: var(--teal); border: 0.5px solid rgba(126,207,173,0.3); }
+  .badge.bad-website { background: rgba(251,191,36,0.1); color: var(--amber); border: 0.5px solid rgba(251,191,36,0.25); }
+  .badge.has-website { background: rgba(255,255,255,0.04); color: var(--text-faint); border: 0.5px solid var(--border); }
+  .result-website { font-size: 11px; color: var(--text-faint); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; }
+  .result-website a { color: var(--text-muted); text-decoration: none; }
+  .result-website a:hover { color: var(--teal); }
+  .result-phone { font-size: 12px; color: var(--teal); opacity: 0.7; }
+  .add-btn { font-size: 11px; font-weight: 600; color: var(--bg); background: var(--teal); border: none; border-radius: 100px; padding: 0.3rem 0.85rem; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap; }
+  .add-btn:hover { background: var(--teal-light); }
+  .add-btn.added { background: transparent; color: var(--teal); border: 0.5px solid var(--border-teal); cursor: default; }
+  .state-box { text-align: center; padding: 4rem 2rem; border: 0.5px dashed var(--border); border-radius: 12px; color: var(--text-faint); }
+  .state-icon { font-size: 36px; margin-bottom: 1rem; opacity: 0.5; }
+  .state-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text-muted); margin-bottom: 0.5rem; }
+  .state-desc { font-size: 13px; font-weight: 300; line-height: 1.6; max-width: 360px; margin: 0 auto; }
+  .spinner { width: 24px; height: 24px; border: 2px solid var(--border-teal); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+  .error-box { background: rgba(248,113,113,0.08); border: 0.5px solid rgba(248,113,113,0.25); border-radius: 10px; padding: 1rem 1.25rem; font-size: 13px; color: var(--red); margin-bottom: 1.5rem; line-height: 1.5; }
+  .crm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+  .crm-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); letter-spacing: -0.3px; }
+  .crm-actions { display: flex; gap: 0.5rem; }
+  .crm-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
+  .crm-stat { background: var(--bg-card); padding: 0.85rem 1rem; text-align: center; }
+  .crm-stat-num { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); line-height: 1; margin-bottom: 0.2rem; }
+  .crm-stat-label { font-size: 10px; color: var(--text-faint); letter-spacing: 1px; text-transform: uppercase; }
+  .crm-table-wrap { border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 800px; }
+  thead tr { background: var(--bg-mid); border-bottom: 0.5px solid var(--border); }
+  th { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-faint); padding: 0.85rem 1rem; text-align: left; white-space: nowrap; }
+  tbody tr { border-bottom: 0.5px solid var(--border); transition: background 0.15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--bg-mid); }
+  td { padding: 0.85rem 1rem; font-size: 13px; color: var(--text-muted); vertical-align: middle; }
+  td.name-cell { color: var(--text); font-weight: 500; }
+  td.name-cell a { color: var(--text); text-decoration: none; }
+  td.name-cell a:hover { color: var(--teal); }
+  .status-cell { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+  .status-toggle { font-size: 10px; font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 100px; cursor: pointer; border: 0.5px solid var(--border); background: transparent; color: var(--text-faint); font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap; }
+  .status-toggle:hover { border-color: var(--border-teal); color: var(--text); }
+  .status-toggle.on { background: var(--teal-dim); border-color: rgba(126,207,173,0.4); color: var(--teal); }
+  .status-toggle.on.called { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: var(--amber); }
+  .status-toggle.on.not-interested { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.25); color: var(--red); }
+  .status-toggle.on.closed { background: rgba(126,207,173,0.2); border-color: rgba(126,207,173,0.5); color: var(--teal); }
+  .notes-input { background: transparent; border: none; outline: none; font-size: 12px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; width: 100%; min-width: 120px; }
+  .notes-input::placeholder { color: var(--text-faint); }
+  .notes-input:focus { color: var(--text); }
+  .delete-btn { font-size: 18px; color: var(--text-faint); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; transition: color 0.15s; line-height: 1; }
+  .delete-btn:hover { color: var(--red); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 700px) { .form-row { grid-template-columns: 1fr; } .stats-bar { grid-template-columns: repeat(2,1fr); } .result-card { grid-template-columns: 1fr; } .result-right { align-items: flex-start; flex-direction: row; flex-wrap: wrap; } .crm-stats { grid-template-columns: repeat(3,1fr); } }
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center;gap:0.5rem">
+    <span class="logo">thira</span>
+    <span class="logo-sub">Prospector</span>
+  </div>
+  <div class="header-badge">Lead Finder</div>
+</header>
+
+<div class="container">
+  <div class="main-tabs">
+    <button class="main-tab active" onclick="switchTab('search')">&#128269; Search</button>
+    <button class="main-tab" onclick="switchTab('crm')" id="crmTab">&#128101; My List <span class="tab-count" id="crmCount">0</span></button>
+  </div>
+
+  <!-- SEARCH TAB -->
+  <div class="tab-panel active" id="searchPanel">
+    <div class="search-panel">
+      <div class="panel-title">Find businesses without websites</div>
+      <div class="panel-sub">Search any trade or service in any UK location. Click a business name to open Google Maps. Hit "Add to List" to track them in your pipeline.</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Business Type</label>
+          <input type="text" id="businessType" placeholder="e.g. electrician, plumber, florist" value="carpenter">
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" id="location" placeholder="e.g. East London, Manchester" value="Dulwich">
+        </div>
+        <button class="search-btn" id="searchBtn" onclick="runSearch()">Search &rarr;</button>
+      </div>
+      <div class="quick-picks">
+        <span class="quick-label">Quick:</span>
+        <button class="quick-pill" onclick="setSearch('electrician','East London')">Electricians &middot; East London</button>
+        <button class="quick-pill" onclick="setSearch('plumber','South London')">Plumbers &middot; South London</button>
+        <button class="quick-pill" onclick="setSearch('carpenter','Dulwich')">Carpenters &middot; Dulwich</button>
+        <button class="quick-pill" onclick="setSearch('florist','Essex')">Florists &middot; Essex</button>
+        <button class="quick-pill" onclick="setSearch('plasterer','Romford')">Plasterers &middot; Romford</button>
+        <button class="quick-pill" onclick="setSearch('tiler','Ilford')">Tilers &middot; Ilford</button>
+      </div>
+      <div class="api-section">
+        <div class="form-group">
+          <label>SerpApi Key</label>
+          <input type="password" id="apiKey" placeholder="Paste your SerpApi key here">
+        </div>
+        <div class="api-note">Your key is used only to query Google Maps via SerpApi. It is never stored on our server.</div>
+      </div>
+    </div>
+
+    <div class="error-box" id="errorBox" style="display:none"></div>
+
+    <div class="stats-bar" id="statsBar" style="display:none">
+      <div class="stat-cell"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total found</div></div>
+      <div class="stat-cell"><div class="stat-num green" id="statNoWebsite">0</div><div class="stat-label">No website</div></div>
+      <div class="stat-cell"><div class="stat-num amber" id="statBadWebsite">0</div><div class="stat-label">Weak presence</div></div>
+      <div class="stat-cell"><div class="stat-num" id="statHasWebsite">0</div><div class="stat-label">Has website</div></div>
+    </div>
+
+    <div id="resultsArea">
+      <div class="state-box">
+        <div class="state-icon">&#128269;</div>
+        <div class="state-title">Ready to prospect</div>
+        <div class="state-desc">Enter a business type and location then hit search. Click any name to open it in Google Maps.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRM TAB -->
+  <div class="tab-panel" id="crmPanel">
+    <div class="crm-header">
+      <div class="crm-title">My Prospect List</div>
+      <div class="crm-actions">
+        <button class="action-btn" onclick="exportCRM()">Export CSV</button>
+        <button class="action-btn" onclick="clearCRM()" style="color:var(--red);border-color:rgba(248,113,113,0.3)">Clear all</button>
+      </div>
+    </div>
+    <div class="crm-stats">
+      <div class="crm-stat"><div class="crm-stat-num" id="crmTotal">0</div><div class="crm-stat-label">Total</div></div>
+      <div class="crm-stat"><div class="crm-stat-num" id="crmCalled">0</div><div class="crm-stat-label">Called</div></div>
+      <div class="crm-stat"><div class="crm-stat-num" id="crmEmailed">0</div><div class="crm-stat-label">Emailed</div></div>
+      <div class="crm-stat"><div class="crm-stat-num" id="crmInterested">0</div><div class="crm-stat-label">Interested</div></div>
+      <div class="crm-stat"><div class="crm-stat-num" id="crmClosed">0</div><div class="crm-stat-label">Closed</div></div>
+    </div>
+    <div id="crmArea">
+      <div class="state-box">
+        <div class="state-icon">&#128101;</div>
+        <div class="state-title">Your list is empty</div>
+        <div class="state-desc">Search for prospects and click "Add to List" to start tracking them here.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var allResults = [];
+var crmList = JSON.parse(localStorage.getItem('thira_crm') || '[]');
+
+function saveCRM() { localStorage.setItem('thira_crm', JSON.stringify(crmList)); updateCRMCount(); }
+function updateCRMCount() { document.getElementById('crmCount').textContent = crmList.length; }
+
+function switchTab(tab) {
+  document.querySelectorAll('.main-tab').forEach(function(t, i) {
+    t.classList.toggle('active', (i===0&&tab==='search')||(i===1&&tab==='crm'));
+  });
+  document.getElementById('searchPanel').classList.toggle('active', tab==='search');
+  document.getElementById('crmPanel').classList.toggle('active', tab==='crm');
+  if (tab==='crm') renderCRM();
+}
+
+function setSearch(t, l) { document.getElementById('businessType').value=t; document.getElementById('location').value=l; }
+
+function classifyWebsite(w) {
+  if (!w) return 'no-website';
+  var u = w.toLowerCase();
+  if (u.indexOf('facebook.com')>-1||u.indexOf('fb.com')>-1||u.indexOf('instagram.com')>-1||
+      u.indexOf('linktr.ee')>-1||u.indexOf('yell.com')>-1||u.indexOf('checkatrade')>-1||
+      u.indexOf('trustatrader')>-1||u.indexOf('rated.people')>-1) return 'bad-website';
+  return 'has-website';
+}
+
+function badgeLabel(t) { return t==='no-website'?'No website':t==='bad-website'?'Weak presence':'Has website'; }
+
+function starsHtml(r) {
+  if (!r) return '';
+  var f=Math.round(r), s='';
+  for(var i=0;i<f;i++) s+='\u2605';
+  for(var i=f;i<5;i++) s+='\u2606';
+  return '<span class="stars">'+s+' '+r+'</span>';
+}
+
+function sortOrder(t) { return t==='no-website'?0:t==='bad-website'?1:2; }
+function mapsUrl(n, a) { return 'https://www.google.com/maps/search/'+encodeURIComponent(n+' '+a); }
+function isInCRM(title, address) { return crmList.some(function(c){ return c.title===title&&c.address===address; }); }
+
+function addToCRM(idx) {
+  var r = allResults[idx];
+  if (isInCRM(r.title, r.address)) return;
+  crmList.push({ id:Date.now(), title:r.title, address:r.address, phone:r.phone, website:r.website, websiteType:r.websiteType, mapsUrl:mapsUrl(r.title,r.address), status:{called:false,emailed:false,interested:false,notInterested:false,closed:false}, notes:'', addedAt:new Date().toLocaleDateString() });
+  saveCRM();
+  var btn = document.getElementById('addbtn_'+idx);
+  if (btn) { btn.textContent='\u2713 Added'; btn.classList.add('added'); btn.disabled=true; }
+}
+
+function toggleStatus(id, key) {
+  var item = crmList.find(function(c){ return c.id===id; });
+  if (!item) return;
+  if (key==='interested'&&!item.status.interested) item.status.notInterested=false;
+  if (key==='notInterested'&&!item.status.notInterested) item.status.interested=false;
+  item.status[key] = !item.status[key];
+  saveCRM(); renderCRM();
+}
+
+function updateNotes(id, val) {
+  var item = crmList.find(function(c){ return c.id===id; });
+  if (item) { item.notes=val; saveCRM(); }
+}
+
+function deleteFromCRM(id) { crmList=crmList.filter(function(c){ return c.id!==id; }); saveCRM(); renderCRM(); }
+
+function clearCRM() {
+  if (!crmList.length) return;
+  if (confirm('Clear all '+crmList.length+' prospects?')) { crmList=[]; saveCRM(); renderCRM(); }
+}
+
+function renderCRM() {
+  var called=crmList.filter(function(c){ return c.status.called; }).length;
+  var emailed=crmList.filter(function(c){ return c.status.emailed; }).length;
+  var interested=crmList.filter(function(c){ return c.status.interested; }).length;
+  var closed=crmList.filter(function(c){ return c.status.closed; }).length;
+  document.getElementById('crmTotal').textContent=crmList.length;
+  document.getElementById('crmCalled').textContent=called;
+  document.getElementById('crmEmailed').textContent=emailed;
+  document.getElementById('crmInterested').textContent=interested;
+  document.getElementById('crmClosed').textContent=closed;
+  var area=document.getElementById('crmArea');
+  if (!crmList.length) { area.innerHTML='<div class="state-box"><div class="state-icon">&#128101;</div><div class="state-title">Your list is empty</div><div class="state-desc">Search for prospects and click "Add to List" to start tracking them here.</div></div>'; return; }
+  var html='<div class="crm-table-wrap"><table><thead><tr><th>Business</th><th>Contact</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>';
+  for (var i=0;i<crmList.length;i++) {
+    var c=crmList[i]; var s=c.status;
+    html+='<tr>';
+    html+='<td class="name-cell"><a href="'+c.mapsUrl+'" target="_blank">'+c.title+' &#8599;</a>';
+    if(c.address) html+='<div style="font-size:11px;color:var(--text-faint);font-weight:400;margin-top:2px">'+c.address+'</div>';
+    html+='<div style="margin-top:4px"><span class="badge '+c.websiteType+'">'+badgeLabel(c.websiteType)+'</span></div></td>';
+    html+='<td>';
+    if(c.phone) html+='<div style="font-size:12px;color:var(--teal);opacity:0.8">'+c.phone+'</div>';
+    if(c.website) html+='<div style="font-size:11px;color:var(--text-faint);margin-top:2px"><a href="'+c.website+'" target="_blank" style="color:var(--text-faint)">'+c.website.replace(/^https?:\/\/(www\.)?/,'').substring(0,25)+'</a></div>';
+    if(!c.phone&&!c.website) html+='<span style="color:var(--text-faint);font-size:12px">—</span>';
+    html+='</td>';
+    html+='<td><div class="status-cell">';
+    html+='<button class="status-toggle '+(s.called?'on called':'')+'" onclick="toggleStatus('+c.id+',\'called\')">Called</button>';
+    html+='<button class="status-toggle '+(s.emailed?'on emailed':'')+'" onclick="toggleStatus('+c.id+',\'emailed\')">Emailed</button>';
+    html+='<button class="status-toggle '+(s.interested?'on interested':'')+'" onclick="toggleStatus('+c.id+',\'interested\')">Interested</button>';
+    html+='<button class="status-toggle '+(s.notInterested?'on not-interested':'')+'" onclick="toggleStatus('+c.id+',\'notInterested\')">Not interested</button>';
+    html+='<button class="status-toggle '+(s.closed?'on closed':'')+'" onclick="toggleStatus('+c.id+',\'closed\')">&#127881; Closed</button>';
+    html+='</div></td>';
+    html+='<td><input class="notes-input" placeholder="Add a note..." value="'+(c.notes||'').replace(/"/g,'&quot;')+'" onchange="updateNotes('+c.id+',this.value)"></td>';
+    html+='<td><button class="delete-btn" onclick="deleteFromCRM('+c.id+')" title="Remove">&times;</button></td>';
+    html+='</tr>';
+  }
+  html+='</tbody></table></div>';
+  area.innerHTML=html;
+}
+
+function exportCRM() {
+  if (!crmList.length) { alert('Nothing to export.'); return; }
+  var rows=[['Business','Address','Phone','Website','Status','Notes','Added']];
+  crmList.forEach(function(c) {
+    var st=[];
+    if(c.status.called) st.push('Called');
+    if(c.status.emailed) st.push('Emailed');
+    if(c.status.interested) st.push('Interested');
+    if(c.status.notInterested) st.push('Not interested');
+    if(c.status.closed) st.push('Closed');
+    rows.push(['"'+c.title+'"','"'+(c.address||'')+'"',c.phone||'',c.website||'',st.join(' | '),'"'+(c.notes||'')+'"',c.addedAt||'']);
+  });
+  var csv=rows.map(function(r){ return r.join(','); }).join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='thira-crm-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+function updateStats() {
+  var nw=allResults.filter(function(r){ return r.websiteType==='no-website'; }).length;
+  var bw=allResults.filter(function(r){ return r.websiteType==='bad-website'; }).length;
+  var hw=allResults.filter(function(r){ return r.websiteType==='has-website'; }).length;
+  document.getElementById('statTotal').textContent=allResults.length;
+  document.getElementById('statNoWebsite').textContent=nw;
+  document.getElementById('statBadWebsite').textContent=bw;
+  document.getElementById('statHasWebsite').textContent=hw;
+  document.getElementById('statsBar').style.display='grid';
+}
+
+function renderResults(filter) {
+  document.querySelectorAll('.filter-tab').forEach(function(t){ t.classList.toggle('active',t.dataset.filter===filter); });
+  var filtered=allResults;
+  if(filter==='prospects') filtered=allResults.filter(function(r){ return r.websiteType!=='has-website'; });
+  if(filter==='no-website') filtered=allResults.filter(function(r){ return r.websiteType==='no-website'; });
+  if(filter==='bad-website') filtered=allResults.filter(function(r){ return r.websiteType==='bad-website'; });
+  var grid=document.querySelector('.results-grid');
+  if(!grid) return;
+  if(!filtered.length) { grid.innerHTML='<div class="state-box"><div class="state-title">No results in this category.</div></div>'; return; }
+  var html='';
+  for(var i=0;i<filtered.length;i++) {
+    var r=filtered[i]; var origIdx=allResults.indexOf(r);
+    var alreadyAdded=isInCRM(r.title,r.address);
+    var websiteHtml=r.website?'<a href="'+r.website+'" target="_blank">'+r.website.replace(/^https?:\/\/(www\.)?/,'').substring(0,28)+'</a>':'<span style="font-style:italic">No website</span>';
+    var gmaps=mapsUrl(r.title,r.address);
+    html+='<div class="result-card '+r.websiteType+'" style="animation-delay:'+(i*0.04)+'s">';
+    html+='<div><div class="result-name"><a href="'+gmaps+'" target="_blank">'+r.title+' &#128205;</a></div>';
+    html+='<div class="result-meta">';
+    if(r.rating) html+=starsHtml(r.rating);
+    if(r.reviews) html+='<span class="result-meta-item">'+r.reviews+' reviews</span>';
+    if(r.type) html+='<span class="result-meta-item" style="color:rgba(126,207,173,0.5)">'+r.type+'</span>';
+    html+='</div>';
+    if(r.address) html+='<div class="result-address">'+r.address+'</div>';
+    if(r.phone) html+='<div style="margin-top:0.3rem"><span class="result-phone">'+r.phone+'</span></div>';
+    html+='</div><div class="result-right">';
+    html+='<span class="badge '+r.websiteType+'">'+badgeLabel(r.websiteType)+'</span>';
+    html+='<div class="result-website">'+websiteHtml+'</div>';
+    if(alreadyAdded) html+='<button class="add-btn added" disabled>\u2713 Added</button>';
+    else html+='<button class="add-btn" id="addbtn_'+origIdx+'" onclick="addToCRM('+origIdx+')">+ Add to list</button>';
+    html+='</div></div>';
+  }
+  grid.innerHTML=html;
+}
+
+async function runSearch() {
+  var businessType=document.getElementById('businessType').value.trim();
+  var location=document.getElementById('location').value.trim();
+  var apiKey=document.getElementById('apiKey').value.trim();
+  var btn=document.getElementById('searchBtn');
+  var errorBox=document.getElementById('errorBox');
+  errorBox.style.display='none';
+  if(!businessType||!location) { errorBox.textContent='Please enter a business type and location.'; errorBox.style.display='block'; return; }
+  if(!apiKey) { errorBox.textContent='Please enter your SerpApi key.'; errorBox.style.display='block'; return; }
+  btn.disabled=true; btn.textContent='Searching...';
+  document.getElementById('statsBar').style.display='none';
+  allResults=[];
+  document.getElementById('resultsArea').innerHTML='<div class="state-box"><div class="spinner"></div><div class="state-title">Searching Google Maps...</div><div class="state-desc">Finding '+businessType+'s in '+location+'...</div></div>';
+  try {
+    var q=encodeURIComponent(businessType+' in '+location+', UK');
+    var url='/search?q='+q+'&key='+encodeURIComponent(apiKey);
+    var res=await fetch(url);
+    var data=await res.json();
+    if(data.error) throw new Error(data.error);
+    var results=data.local_results||[];
+    if(!results.length) { document.getElementById('resultsArea').innerHTML='<div class="state-box"><div class="state-icon">&#128235;</div><div class="state-title">No results found</div><div class="state-desc">Try a different term or broader location.</div></div>'; btn.disabled=false; btn.textContent='Search \u2192'; return; }
+    allResults=results.map(function(r){ return {title:r.title||'Unknown',address:r.address||'',phone:r.phone||'',website:r.website||null,rating:r.rating||null,reviews:r.reviews||null,type:r.type||'',websiteType:classifyWebsite(r.website)}; }).sort(function(a,b){ return sortOrder(a.websiteType)-sortOrder(b.websiteType); });
+    updateStats();
+    var nw=allResults.filter(function(r){ return r.websiteType==='no-website'; }).length;
+    var bw=allResults.filter(function(r){ return r.websiteType==='bad-website'; }).length;
+    document.getElementById('resultsArea').innerHTML=
+      '<div class="results-header"><div class="results-title">'+allResults.length+' businesses found &middot; "'+businessType+'" in '+location+'</div><div><button class="action-btn" onclick="exportProspects()">Export CSV</button></div></div>'+
+      '<div class="filter-tabs">'+
+      '<button class="filter-tab active" data-filter="prospects" onclick="renderResults(\'prospects\')">Prospects ('+(nw+bw)+')</button>'+
+      '<button class="filter-tab" data-filter="no-website" onclick="renderResults(\'no-website\')">No website ('+nw+')</button>'+
+      '<button class="filter-tab" data-filter="bad-website" onclick="renderResults(\'bad-website\')">Weak presence ('+bw+')</button>'+
+      '<button class="filter-tab" data-filter="all" onclick="renderResults(\'all\')">All ('+allResults.length+')</button>'+
+      '</div><div class="results-grid"></div>';
+    renderResults('prospects');
+  } catch(err) {
+    errorBox.textContent='Error: '+err.message;
+    errorBox.style.display='block';
+    document.getElementById('resultsArea').innerHTML='<div class="state-box"><div class="state-icon">&#9888;</div><div class="state-title">Something went wrong</div><div class="state-desc">'+err.message+'</div></div>';
+  }
+  btn.disabled=false; btn.textContent='Search \u2192';
+}
+
+function exportProspects() {
+  var prospects=allResults.filter(function(r){ return r.websiteType!=='has-website'; });
+  if(!prospects.length) { alert('No prospects to export.'); return; }
+  var rows=[['Business Name','Address','Phone','Status','Website','Rating','Reviews']];
+  prospects.forEach(function(r){ rows.push(['"'+r.title+'"','"'+(r.address||'')+'"',r.phone||'',badgeLabel(r.websiteType),r.website||'',r.rating||'',r.reviews||'']); });
+  var csv=rows.map(function(r){ return r.join(','); }).join('\n');
+  var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='thira-prospects-'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+}
+
+updateCRMCount();
+document.addEventListener('keydown', function(e){ if(e.key==='Enter'&&document.getElementById('searchPanel').classList.contains('active')) runSearch(); });
+</script>
+</body>
+</html>
