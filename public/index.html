@@ -103,7 +103,7 @@
   tbody tr { border-bottom: 0.5px solid var(--border); transition: background 0.15s; }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: var(--bg-mid); }
-  td { padding: 0.85rem 1rem; font-size: 13px; color: var(--text-muted); vertical-align: middle; }
+  td { padding: 0.85rem 1rem; font-size: 13px; color: var(--text-muted); vertical-align: top; }
   td.name-cell { color: var(--text); font-weight: 500; }
   td.name-cell a { color: var(--text); text-decoration: none; }
   td.name-cell a:hover { color: var(--teal); }
@@ -114,9 +114,12 @@
   .status-toggle.on.called { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: var(--amber); }
   .status-toggle.on.not-interested { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.25); color: var(--red); }
   .status-toggle.on.closed { background: rgba(126,207,173,0.2); border-color: rgba(126,207,173,0.5); color: var(--teal); }
-  .notes-input { background: transparent; border: none; outline: none; font-size: 12px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; width: 100%; min-width: 120px; }
-  .notes-input::placeholder { color: var(--text-faint); }
-  .notes-input:focus { color: var(--text); }
+  .notes-cell { min-width: 200px; max-width: 280px; }
+  .notes-preview { font-size: 12px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; padding: 0.5rem 0.7rem; border: 0.5px solid var(--border); border-radius: 6px; cursor: pointer; transition: all 0.15s; min-height: 32px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .notes-preview:hover { border-color: var(--border-teal); background: var(--bg-mid); color: var(--text); }
+  .notes-preview.empty { color: var(--text-faint); font-style: italic; }
+  .notes-textarea { font-size: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; background: var(--bg); border: 0.5px solid var(--border-teal); border-radius: 6px; padding: 0.6rem 0.7rem; width: 100%; min-height: 90px; resize: vertical; outline: none; line-height: 1.5; transition: border-color 0.15s; }
+  .notes-textarea:focus { border-color: var(--teal); }
   .delete-btn { font-size: 18px; color: var(--text-faint); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; transition: color 0.15s; line-height: 1; }
   .delete-btn:hover { color: var(--red); }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -281,6 +284,35 @@ function updateNotes(id, val) {
   if (item) { item.notes=val; saveCRM(); }
 }
 
+function expandNotes(id) {
+  var wrap = document.getElementById('notes_wrap_'+id);
+  if (!wrap) return;
+  var item = crmList.find(function(c){ return c.id===id; });
+  if (!item) return;
+  var val = (item.notes||'').replace(/"/g,'&quot;');
+  wrap.innerHTML = '<textarea class="notes-textarea" id="notes_ta_'+id+'" placeholder="Type your notes here..." oninput="updateNotes('+id+',this.value)" onblur="collapseNotes('+id+')">'+val+'</textarea>';
+  var ta = document.getElementById('notes_ta_'+id);
+  ta.focus();
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+}
+
+function collapseNotes(id) {
+  var wrap = document.getElementById('notes_wrap_'+id);
+  if (!wrap) return;
+  var item = crmList.find(function(c){ return c.id===id; });
+  if (!item) return;
+  var preview = (item.notes||'').trim();
+  if (preview) {
+    wrap.innerHTML = '<div class="notes-preview" onclick="expandNotes('+id+')" title="Click to edit">'+escapeHtml(preview)+'</div>';
+  } else {
+    wrap.innerHTML = '<div class="notes-preview empty" onclick="expandNotes('+id+')">Add notes...</div>';
+  }
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 function deleteFromCRM(id) { crmList=crmList.filter(function(c){ return c.id!==id; }); saveCRM(); renderCRM(); }
 
 function clearCRM() {
@@ -319,7 +351,14 @@ function renderCRM() {
     html+='<button class="status-toggle '+(s.notInterested?'on not-interested':'')+'" onclick="toggleStatus('+c.id+',\'notInterested\')">Not interested</button>';
     html+='<button class="status-toggle '+(s.closed?'on closed':'')+'" onclick="toggleStatus('+c.id+',\'closed\')">&#127881; Closed</button>';
     html+='</div></td>';
-    html+='<td><input class="notes-input" placeholder="Add a note..." value="'+(c.notes||'').replace(/"/g,'&quot;')+'" onchange="updateNotes('+c.id+',this.value)"></td>';
+    var notesContent = (c.notes||'').trim();
+    html+='<td class="notes-cell"><div id="notes_wrap_'+c.id+'">';
+    if (notesContent) {
+      html+='<div class="notes-preview" onclick="expandNotes('+c.id+')" title="Click to edit">'+escapeHtml(notesContent)+'</div>';
+    } else {
+      html+='<div class="notes-preview empty" onclick="expandNotes('+c.id+')">Add notes...</div>';
+    }
+    html+='</div></td>';
     html+='<td><button class="delete-btn" onclick="deleteFromCRM('+c.id+')" title="Remove">&times;</button></td>';
     html+='</tr>';
   }
@@ -337,7 +376,7 @@ function exportCRM() {
     if(c.status.interested) st.push('Interested');
     if(c.status.notInterested) st.push('Not interested');
     if(c.status.closed) st.push('Closed');
-    rows.push(['"'+c.title+'"','"'+(c.address||'')+'"',c.phone||'',c.website||'',st.join(' | '),'"'+(c.notes||'')+'"',c.addedAt||'']);
+    rows.push(['"'+c.title+'"','"'+(c.address||'')+'"',c.phone||'',c.website||'',st.join(' | '),'"'+(c.notes||'').replace(/"/g,'""').replace(/\n/g,' ')+'"',c.addedAt||'']);
   });
   var csv=rows.map(function(r){ return r.join(','); }).join('\n');
   var a=document.createElement('a');
