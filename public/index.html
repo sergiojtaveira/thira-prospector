@@ -12,7 +12,7 @@
     --bg: #0d1f1a; --bg-mid: #122b24; --bg-card: #0f2520;
     --text: #e8f0ec; --text-muted: rgba(232,240,236,0.55); --text-faint: rgba(232,240,236,0.28);
     --border: rgba(255,255,255,0.07); --border-teal: rgba(126,207,173,0.22);
-    --red: #f87171; --amber: #fbbf24;
+    --red: #f87171; --amber: #fbbf24; --blue: #60a5fa;
   }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
   header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2rem; border-bottom: 0.5px solid var(--border); background: rgba(13,31,26,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 50; }
@@ -92,9 +92,10 @@
   .crm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
   .crm-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); letter-spacing: -0.3px; }
   .crm-actions { display: flex; gap: 0.5rem; }
-  .crm-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
+  .crm-stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: var(--border); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
   .crm-stat { background: var(--bg-card); padding: 0.85rem 1rem; text-align: center; }
   .crm-stat-num { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); line-height: 1; margin-bottom: 0.2rem; }
+  .crm-stat-num.blue { color: var(--blue); }
   .crm-stat-label { font-size: 10px; color: var(--text-faint); letter-spacing: 1px; text-transform: uppercase; }
   .crm-table-wrap { border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; min-width: 800px; }
@@ -112,6 +113,7 @@
   .status-toggle:hover { border-color: var(--border-teal); color: var(--text); }
   .status-toggle.on { background: var(--teal-dim); border-color: rgba(126,207,173,0.4); color: var(--teal); }
   .status-toggle.on.called { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: var(--amber); }
+  .status-toggle.on.callback { background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.3); color: var(--blue); }
   .status-toggle.on.not-interested { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.25); color: var(--red); }
   .status-toggle.on.closed { background: rgba(126,207,173,0.2); border-color: rgba(126,207,173,0.5); color: var(--teal); }
   .notes-cell { min-width: 200px; max-width: 280px; }
@@ -206,6 +208,7 @@
     <div class="crm-stats">
       <div class="crm-stat"><div class="crm-stat-num" id="crmTotal">0</div><div class="crm-stat-label">Total</div></div>
       <div class="crm-stat"><div class="crm-stat-num" id="crmCalled">0</div><div class="crm-stat-label">Called</div></div>
+      <div class="crm-stat"><div class="crm-stat-num blue" id="crmCallback">0</div><div class="crm-stat-label">Call Back</div></div>
       <div class="crm-stat"><div class="crm-stat-num" id="crmEmailed">0</div><div class="crm-stat-label">Emailed</div></div>
       <div class="crm-stat"><div class="crm-stat-num" id="crmInterested">0</div><div class="crm-stat-label">Interested</div></div>
       <div class="crm-stat"><div class="crm-stat-num" id="crmClosed">0</div><div class="crm-stat-label">Closed</div></div>
@@ -223,6 +226,9 @@
 <script>
 var allResults = [];
 var crmList = JSON.parse(localStorage.getItem('thira_crm') || '[]');
+
+// Migrate older records to include callback status
+crmList.forEach(function(c){ if(c.status && typeof c.status.callback === 'undefined') c.status.callback = false; });
 
 function saveCRM() { localStorage.setItem('thira_crm', JSON.stringify(crmList)); updateCRMCount(); }
 function updateCRMCount() { document.getElementById('crmCount').textContent = crmList.length; }
@@ -264,7 +270,7 @@ function isInCRM(title, address) { return crmList.some(function(c){ return c.tit
 function addToCRM(idx) {
   var r = allResults[idx];
   if (isInCRM(r.title, r.address)) return;
-  crmList.push({ id:Date.now(), title:r.title, address:r.address, phone:r.phone, website:r.website, websiteType:r.websiteType, mapsUrl:mapsUrl(r.title,r.address), status:{called:false,emailed:false,interested:false,notInterested:false,closed:false}, notes:'', addedAt:new Date().toLocaleDateString() });
+  crmList.push({ id:Date.now(), title:r.title, address:r.address, phone:r.phone, website:r.website, websiteType:r.websiteType, mapsUrl:mapsUrl(r.title,r.address), status:{called:false,callback:false,emailed:false,interested:false,notInterested:false,closed:false}, notes:'', addedAt:new Date().toLocaleDateString() });
   saveCRM();
   var btn = document.getElementById('addbtn_'+idx);
   if (btn) { btn.textContent='\u2713 Added'; btn.classList.add('added'); btn.disabled=true; }
@@ -322,11 +328,13 @@ function clearCRM() {
 
 function renderCRM() {
   var called=crmList.filter(function(c){ return c.status.called; }).length;
+  var callback=crmList.filter(function(c){ return c.status.callback; }).length;
   var emailed=crmList.filter(function(c){ return c.status.emailed; }).length;
   var interested=crmList.filter(function(c){ return c.status.interested; }).length;
   var closed=crmList.filter(function(c){ return c.status.closed; }).length;
   document.getElementById('crmTotal').textContent=crmList.length;
   document.getElementById('crmCalled').textContent=called;
+  document.getElementById('crmCallback').textContent=callback;
   document.getElementById('crmEmailed').textContent=emailed;
   document.getElementById('crmInterested').textContent=interested;
   document.getElementById('crmClosed').textContent=closed;
@@ -346,6 +354,7 @@ function renderCRM() {
     html+='</td>';
     html+='<td><div class="status-cell">';
     html+='<button class="status-toggle '+(s.called?'on called':'')+'" onclick="toggleStatus('+c.id+',\'called\')">Called</button>';
+    html+='<button class="status-toggle '+(s.callback?'on callback':'')+'" onclick="toggleStatus('+c.id+',\'callback\')">&#128222; Call back</button>';
     html+='<button class="status-toggle '+(s.emailed?'on emailed':'')+'" onclick="toggleStatus('+c.id+',\'emailed\')">Emailed</button>';
     html+='<button class="status-toggle '+(s.interested?'on interested':'')+'" onclick="toggleStatus('+c.id+',\'interested\')">Interested</button>';
     html+='<button class="status-toggle '+(s.notInterested?'on not-interested':'')+'" onclick="toggleStatus('+c.id+',\'notInterested\')">Not interested</button>';
@@ -372,6 +381,7 @@ function exportCRM() {
   crmList.forEach(function(c) {
     var st=[];
     if(c.status.called) st.push('Called');
+    if(c.status.callback) st.push('Call back');
     if(c.status.emailed) st.push('Emailed');
     if(c.status.interested) st.push('Interested');
     if(c.status.notInterested) st.push('Not interested');
