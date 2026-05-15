@@ -98,7 +98,7 @@
   .crm-stat-num.blue { color: var(--blue); }
   .crm-stat-label { font-size: 10px; color: var(--text-faint); letter-spacing: 1px; text-transform: uppercase; }
   .crm-table-wrap { border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; min-width: 800px; }
+  table { width: 100%; border-collapse: collapse; min-width: 900px; }
   thead tr { background: var(--bg-mid); border-bottom: 0.5px solid var(--border); }
   th { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-faint); padding: 0.85rem 1rem; text-align: left; white-space: nowrap; }
   tbody tr { border-bottom: 0.5px solid var(--border); transition: background 0.15s; }
@@ -122,6 +122,10 @@
   .notes-preview.empty { color: var(--text-faint); font-style: italic; }
   .notes-textarea { font-size: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; background: var(--bg); border: 0.5px solid var(--border-teal); border-radius: 6px; padding: 0.6rem 0.7rem; width: 100%; min-height: 90px; resize: vertical; outline: none; line-height: 1.5; transition: border-color 0.15s; }
   .notes-textarea:focus { border-color: var(--teal); }
+  .email-input { background: transparent; border: 0.5px solid var(--border); border-radius: 6px; padding: 0.4rem 0.6rem; font-size: 11px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; outline: none; transition: all 0.15s; width: 100%; min-width: 150px; }
+  .email-input::placeholder { color: var(--text-faint); font-style: italic; }
+  .email-input:hover { border-color: var(--border-teal); }
+  .email-input:focus { border-color: var(--teal); color: var(--text); background: var(--bg); }
   .delete-btn { font-size: 18px; color: var(--text-faint); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; transition: color 0.15s; line-height: 1; }
   .delete-btn:hover { color: var(--red); }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -227,8 +231,11 @@
 var allResults = [];
 var crmList = JSON.parse(localStorage.getItem('thira_crm') || '[]');
 
-// Migrate older records to include callback status
-crmList.forEach(function(c){ if(c.status && typeof c.status.callback === 'undefined') c.status.callback = false; });
+// Migrate older records to include new fields
+crmList.forEach(function(c){
+  if(c.status && typeof c.status.callback === 'undefined') c.status.callback = false;
+  if(typeof c.email === 'undefined') c.email = '';
+});
 
 function saveCRM() { localStorage.setItem('thira_crm', JSON.stringify(crmList)); updateCRMCount(); }
 function updateCRMCount() { document.getElementById('crmCount').textContent = crmList.length; }
@@ -270,7 +277,7 @@ function isInCRM(title, address) { return crmList.some(function(c){ return c.tit
 function addToCRM(idx) {
   var r = allResults[idx];
   if (isInCRM(r.title, r.address)) return;
-  crmList.push({ id:Date.now(), title:r.title, address:r.address, phone:r.phone, website:r.website, websiteType:r.websiteType, mapsUrl:mapsUrl(r.title,r.address), status:{called:false,callback:false,emailed:false,interested:false,notInterested:false,closed:false}, notes:'', addedAt:new Date().toLocaleDateString() });
+  crmList.push({ id:Date.now(), title:r.title, address:r.address, phone:r.phone, email:'', website:r.website, websiteType:r.websiteType, mapsUrl:mapsUrl(r.title,r.address), status:{called:false,callback:false,emailed:false,interested:false,notInterested:false,closed:false}, notes:'', addedAt:new Date().toLocaleDateString() });
   saveCRM();
   var btn = document.getElementById('addbtn_'+idx);
   if (btn) { btn.textContent='\u2713 Added'; btn.classList.add('added'); btn.disabled=true; }
@@ -288,6 +295,11 @@ function toggleStatus(id, key) {
 function updateNotes(id, val) {
   var item = crmList.find(function(c){ return c.id===id; });
   if (item) { item.notes=val; saveCRM(); }
+}
+
+function updateEmail(id, val) {
+  var item = crmList.find(function(c){ return c.id===id; });
+  if (item) { item.email=val.trim(); saveCRM(); }
 }
 
 function expandNotes(id) {
@@ -340,7 +352,7 @@ function renderCRM() {
   document.getElementById('crmClosed').textContent=closed;
   var area=document.getElementById('crmArea');
   if (!crmList.length) { area.innerHTML='<div class="state-box"><div class="state-icon">&#128101;</div><div class="state-title">Your list is empty</div><div class="state-desc">Search for prospects and click "Add to List" to start tracking them here.</div></div>'; return; }
-  var html='<div class="crm-table-wrap"><table><thead><tr><th>Business</th><th>Contact</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>';
+  var html='<div class="crm-table-wrap"><table><thead><tr><th>Business</th><th>Contact</th><th>Email</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>';
   for (var i=0;i<crmList.length;i++) {
     var c=crmList[i]; var s=c.status;
     html+='<tr>';
@@ -352,6 +364,7 @@ function renderCRM() {
     if(c.website) html+='<div style="font-size:11px;color:var(--text-faint);margin-top:2px"><a href="'+c.website+'" target="_blank" style="color:var(--text-faint)">'+c.website.replace(/^https?:\/\/(www\.)?/,'').substring(0,25)+'</a></div>';
     if(!c.phone&&!c.website) html+='<span style="color:var(--text-faint);font-size:12px">—</span>';
     html+='</td>';
+    html+='<td><input class="email-input" type="email" placeholder="Add email..." value="'+escapeHtml(c.email||'')+'" onchange="updateEmail('+c.id+',this.value)"></td>';
     html+='<td><div class="status-cell">';
     html+='<button class="status-toggle '+(s.called?'on called':'')+'" onclick="toggleStatus('+c.id+',\'called\')">Called</button>';
     html+='<button class="status-toggle '+(s.callback?'on callback':'')+'" onclick="toggleStatus('+c.id+',\'callback\')">&#128222; Call back</button>';
@@ -377,7 +390,7 @@ function renderCRM() {
 
 function exportCRM() {
   if (!crmList.length) { alert('Nothing to export.'); return; }
-  var rows=[['Business','Address','Phone','Website','Status','Notes','Added']];
+  var rows=[['Business','Address','Phone','Email','Website','Status','Notes','Added']];
   crmList.forEach(function(c) {
     var st=[];
     if(c.status.called) st.push('Called');
@@ -386,7 +399,7 @@ function exportCRM() {
     if(c.status.interested) st.push('Interested');
     if(c.status.notInterested) st.push('Not interested');
     if(c.status.closed) st.push('Closed');
-    rows.push(['"'+c.title+'"','"'+(c.address||'')+'"',c.phone||'',c.website||'',st.join(' | '),'"'+(c.notes||'').replace(/"/g,'""').replace(/\n/g,' ')+'"',c.addedAt||'']);
+    rows.push(['"'+c.title+'"','"'+(c.address||'')+'"',c.phone||'',c.email||'',c.website||'',st.join(' | '),'"'+(c.notes||'').replace(/"/g,'""').replace(/\n/g,' ')+'"',c.addedAt||'']);
   });
   var csv=rows.map(function(r){ return r.join(','); }).join('\n');
   var a=document.createElement('a');
