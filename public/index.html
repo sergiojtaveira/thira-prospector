@@ -12,7 +12,7 @@
     --bg: #0d1f1a; --bg-mid: #122b24; --bg-card: #0f2520;
     --text: #e8f0ec; --text-muted: rgba(232,240,236,0.55); --text-faint: rgba(232,240,236,0.28);
     --border: rgba(255,255,255,0.07); --border-teal: rgba(126,207,173,0.22);
-    --red: #f87171; --amber: #fbbf24; --blue: #60a5fa;
+    --red: #f87171; --amber: #fbbf24; --blue: #60a5fa; --gold: #fcd34d;
   }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
   header { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2rem; border-bottom: 0.5px solid var(--border); background: rgba(13,31,26,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 50; }
@@ -91,23 +91,35 @@
   .error-box { background: rgba(248,113,113,0.08); border: 0.5px solid rgba(248,113,113,0.25); border-radius: 10px; padding: 1rem 1.25rem; font-size: 13px; color: var(--red); margin-bottom: 1.5rem; line-height: 1.5; }
   .crm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
   .crm-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); letter-spacing: -0.3px; }
-  .crm-actions { display: flex; gap: 0.5rem; }
-  .crm-stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px; background: var(--border); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
+  .crm-actions { display: flex; gap: 0.5rem; align-items: center; }
+  .crm-stats { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--border); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
   .crm-stat { background: var(--bg-card); padding: 0.85rem 1rem; text-align: center; }
   .crm-stat-num { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); line-height: 1; margin-bottom: 0.2rem; }
   .crm-stat-num.blue { color: var(--blue); }
+  .crm-stat-num.gold { color: var(--gold); }
   .crm-stat-label { font-size: 10px; color: var(--text-faint); letter-spacing: 1px; text-transform: uppercase; }
+  .crm-filter-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .crm-filter { font-size: 11px; font-weight: 500; padding: 0.35rem 0.9rem; border-radius: 100px; border: 0.5px solid var(--border); cursor: pointer; background: transparent; color: var(--text-muted); font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .crm-filter.active { background: var(--teal-dim); border-color: var(--border-teal); color: var(--teal); }
+  .crm-filter.active.starred { background: rgba(252,211,77,0.12); border-color: rgba(252,211,77,0.4); color: var(--gold); }
+  .crm-filter:hover:not(.active) { border-color: var(--border-teal); color: var(--text); }
   .crm-table-wrap { border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; min-width: 900px; }
+  table { width: 100%; border-collapse: collapse; min-width: 1150px; }
   thead tr { background: var(--bg-mid); border-bottom: 0.5px solid var(--border); }
   th { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-faint); padding: 0.85rem 1rem; text-align: left; white-space: nowrap; }
   tbody tr { border-bottom: 0.5px solid var(--border); transition: background 0.15s; }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: var(--bg-mid); }
+  tbody tr.starred-row { background: rgba(252,211,77,0.04); }
+  tbody tr.starred-row:hover { background: rgba(252,211,77,0.08); }
   td { padding: 0.85rem 1rem; font-size: 13px; color: var(--text-muted); vertical-align: top; }
   td.name-cell { color: var(--text); font-weight: 500; }
   td.name-cell a { color: var(--text); text-decoration: none; }
   td.name-cell a:hover { color: var(--teal); }
+  .star-btn { background: none; border: none; cursor: pointer; padding: 0.3rem; font-size: 18px; line-height: 1; transition: transform 0.15s; color: var(--text-faint); }
+  .star-btn:hover { transform: scale(1.15); color: var(--gold); }
+  .star-btn.starred { color: var(--gold); }
+  .star-btn.starred:hover { color: var(--amber); }
   .status-cell { display: flex; gap: 0.35rem; flex-wrap: wrap; }
   .status-toggle { font-size: 10px; font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 100px; cursor: pointer; border: 0.5px solid var(--border); background: transparent; color: var(--text-faint); font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap; }
   .status-toggle:hover { border-color: var(--border-teal); color: var(--text); }
@@ -126,6 +138,15 @@
   .email-input::placeholder { color: var(--text-faint); font-style: italic; }
   .email-input:hover { border-color: var(--border-teal); }
   .email-input:focus { border-color: var(--teal); color: var(--text); background: var(--bg); }
+  .rating-cell { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+  .rating-cell .stars { display: block; margin-bottom: 2px; }
+  .rating-cell .review-count { font-size: 11px; color: var(--text-faint); }
+  .hours-preview { font-size: 11px; color: var(--text-muted); padding: 0.35rem 0.55rem; border: 0.5px solid var(--border); border-radius: 6px; cursor: pointer; transition: all 0.15s; min-width: 110px; max-width: 180px; line-height: 1.3; }
+  .hours-preview:hover { border-color: var(--border-teal); background: var(--bg-mid); color: var(--text); }
+  .hours-preview.empty { color: var(--text-faint); font-style: italic; }
+  .hours-popup { position: absolute; background: var(--bg-mid); border: 0.5px solid var(--border-teal); border-radius: 8px; padding: 0.75rem 1rem; font-size: 11px; color: var(--text); z-index: 100; min-width: 200px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); line-height: 1.6; }
+  .hours-popup div { white-space: nowrap; }
+  .hours-popup .day { color: var(--teal); font-weight: 500; margin-right: 8px; display: inline-block; min-width: 36px; }
   .delete-btn { font-size: 18px; color: var(--text-faint); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; transition: color 0.15s; line-height: 1; }
   .delete-btn:hover { color: var(--red); }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -211,11 +232,19 @@
     </div>
     <div class="crm-stats">
       <div class="crm-stat"><div class="crm-stat-num" id="crmTotal">0</div><div class="crm-stat-label">Total</div></div>
+      <div class="crm-stat"><div class="crm-stat-num gold" id="crmStarred">0</div><div class="crm-stat-label">&#9733; Starred</div></div>
       <div class="crm-stat"><div class="crm-stat-num" id="crmCalled">0</div><div class="crm-stat-label">Called</div></div>
       <div class="crm-stat"><div class="crm-stat-num blue" id="crmCallback">0</div><div class="crm-stat-label">Call Back</div></div>
       <div class="crm-stat"><div class="crm-stat-num" id="crmEmailed">0</div><div class="crm-stat-label">Emailed</div></div>
       <div class="crm-stat"><div class="crm-stat-num" id="crmInterested">0</div><div class="crm-stat-label">Interested</div></div>
       <div class="crm-stat"><div class="crm-stat-num" id="crmClosed">0</div><div class="crm-stat-label">Closed</div></div>
+    </div>
+    <div class="crm-filter-bar" id="crmFilterBar" style="display:none">
+      <button class="crm-filter active" data-filter="all" onclick="setCRMFilter('all')">All</button>
+      <button class="crm-filter" data-filter="starred" onclick="setCRMFilter('starred')">&#9733; Starred only</button>
+      <button class="crm-filter" data-filter="callback" onclick="setCRMFilter('callback')">&#128222; Call back</button>
+      <button class="crm-filter" data-filter="interested" onclick="setCRMFilter('interested')">Interested</button>
+      <button class="crm-filter" data-filter="uncalled" onclick="setCRMFilter('uncalled')">Not yet called</button>
     </div>
     <div id="crmArea">
       <div class="state-box">
@@ -230,11 +259,16 @@
 <script>
 var allResults = [];
 var crmList = JSON.parse(localStorage.getItem('thira_crm') || '[]');
+var crmFilter = 'all';
 
 // Migrate older records to include new fields
 crmList.forEach(function(c){
   if(c.status && typeof c.status.callback === 'undefined') c.status.callback = false;
   if(typeof c.email === 'undefined') c.email = '';
+  if(typeof c.rating === 'undefined') c.rating = null;
+  if(typeof c.reviews === 'undefined') c.reviews = null;
+  if(typeof c.hours === 'undefined') c.hours = null;
+  if(typeof c.starred === 'undefined') c.starred = false;
 });
 
 function saveCRM() { localStorage.setItem('thira_crm', JSON.stringify(crmList)); updateCRMCount(); }
@@ -270,6 +304,45 @@ function starsHtml(r) {
   return '<span class="stars">'+s+' '+r+'</span>';
 }
 
+function formatHoursPreview(hours) {
+  if (!hours) return null;
+  if (typeof hours === 'string') return hours;
+  if (typeof hours === 'object') {
+    var days = Object.keys(hours);
+    if (!days.length) return null;
+    var dayMap = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+    var todayKey = dayMap[new Date().getDay()];
+    var today = null;
+    for (var i=0;i<days.length;i++){
+      if (days[i].toLowerCase().indexOf(todayKey)===0) { today = days[i]; break; }
+    }
+    if (today) return 'Today: '+hours[today];
+    return days[0]+': '+hours[days[0]];
+  }
+  return null;
+}
+
+function formatFullHours(hours) {
+  if (!hours) return 'No hours available';
+  if (typeof hours === 'string') return hours;
+  if (typeof hours === 'object') {
+    var out = '';
+    var order = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+    var keys = Object.keys(hours);
+    keys.sort(function(a,b){
+      var ai = order.findIndex(function(d){ return a.toLowerCase().indexOf(d)===0; });
+      var bi = order.findIndex(function(d){ return b.toLowerCase().indexOf(d)===0; });
+      return (ai===-1?99:ai) - (bi===-1?99:bi);
+    });
+    keys.forEach(function(k){
+      var label = k.charAt(0).toUpperCase()+k.slice(1,3);
+      out += '<div><span class="day">'+label+'</span>'+escapeHtml(String(hours[k]))+'</div>';
+    });
+    return out;
+  }
+  return 'No hours available';
+}
+
 function sortOrder(t) { return t==='no-website'?0:t==='bad-website'?1:2; }
 function mapsUrl(n, a) { return 'https://www.google.com/maps/search/'+encodeURIComponent(n+' '+a); }
 function isInCRM(title, address) { return crmList.some(function(c){ return c.title===title&&c.address===address; }); }
@@ -277,7 +350,7 @@ function isInCRM(title, address) { return crmList.some(function(c){ return c.tit
 function addToCRM(idx) {
   var r = allResults[idx];
   if (isInCRM(r.title, r.address)) return;
-  crmList.push({ id:Date.now(), title:r.title, address:r.address, phone:r.phone, email:'', website:r.website, websiteType:r.websiteType, mapsUrl:mapsUrl(r.title,r.address), status:{called:false,callback:false,emailed:false,interested:false,notInterested:false,closed:false}, notes:'', addedAt:new Date().toLocaleDateString() });
+  crmList.push({ id:Date.now(), title:r.title, address:r.address, phone:r.phone, email:'', website:r.website, websiteType:r.websiteType, rating:r.rating, reviews:r.reviews, hours:r.hours, starred:false, mapsUrl:mapsUrl(r.title,r.address), status:{called:false,callback:false,emailed:false,interested:false,notInterested:false,closed:false}, notes:'', addedAt:new Date().toLocaleDateString() });
   saveCRM();
   var btn = document.getElementById('addbtn_'+idx);
   if (btn) { btn.textContent='\u2713 Added'; btn.classList.add('added'); btn.disabled=true; }
@@ -290,6 +363,22 @@ function toggleStatus(id, key) {
   if (key==='notInterested'&&!item.status.notInterested) item.status.interested=false;
   item.status[key] = !item.status[key];
   saveCRM(); renderCRM();
+}
+
+function toggleStar(id) {
+  var item = crmList.find(function(c){ return c.id===id; });
+  if (!item) return;
+  item.starred = !item.starred;
+  saveCRM(); renderCRM();
+}
+
+function setCRMFilter(filter) {
+  crmFilter = filter;
+  document.querySelectorAll('.crm-filter').forEach(function(b){
+    b.classList.toggle('active', b.dataset.filter === filter);
+    b.classList.toggle('starred', filter === 'starred' && b.dataset.filter === 'starred');
+  });
+  renderCRM();
 }
 
 function updateNotes(id, val) {
@@ -327,6 +416,27 @@ function collapseNotes(id) {
   }
 }
 
+var hoursPopupEl = null;
+function showHoursPopup(id, ev) {
+  ev.stopPropagation();
+  hideHoursPopup();
+  var item = crmList.find(function(c){ return c.id===id; });
+  if (!item) return;
+  var popup = document.createElement('div');
+  popup.className = 'hours-popup';
+  popup.innerHTML = formatFullHours(item.hours);
+  var rect = ev.currentTarget.getBoundingClientRect();
+  popup.style.left = (rect.left + window.scrollX) + 'px';
+  popup.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+  document.body.appendChild(popup);
+  hoursPopupEl = popup;
+  setTimeout(function(){ document.addEventListener('click', hideHoursPopup, { once: true }); }, 10);
+}
+
+function hideHoursPopup() {
+  if (hoursPopupEl) { hoursPopupEl.remove(); hoursPopupEl = null; }
+}
+
 function escapeHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
@@ -338,24 +448,43 @@ function clearCRM() {
   if (confirm('Clear all '+crmList.length+' prospects?')) { crmList=[]; saveCRM(); renderCRM(); }
 }
 
+function getFilteredList() {
+  if (crmFilter === 'starred') return crmList.filter(function(c){ return c.starred; });
+  if (crmFilter === 'callback') return crmList.filter(function(c){ return c.status.callback; });
+  if (crmFilter === 'interested') return crmList.filter(function(c){ return c.status.interested; });
+  if (crmFilter === 'uncalled') return crmList.filter(function(c){ return !c.status.called && !c.status.notInterested && !c.status.closed; });
+  return crmList;
+}
+
 function renderCRM() {
   var called=crmList.filter(function(c){ return c.status.called; }).length;
   var callback=crmList.filter(function(c){ return c.status.callback; }).length;
   var emailed=crmList.filter(function(c){ return c.status.emailed; }).length;
   var interested=crmList.filter(function(c){ return c.status.interested; }).length;
   var closed=crmList.filter(function(c){ return c.status.closed; }).length;
+  var starred=crmList.filter(function(c){ return c.starred; }).length;
   document.getElementById('crmTotal').textContent=crmList.length;
+  document.getElementById('crmStarred').textContent=starred;
   document.getElementById('crmCalled').textContent=called;
   document.getElementById('crmCallback').textContent=callback;
   document.getElementById('crmEmailed').textContent=emailed;
   document.getElementById('crmInterested').textContent=interested;
   document.getElementById('crmClosed').textContent=closed;
+  document.getElementById('crmFilterBar').style.display = crmList.length ? 'flex' : 'none';
   var area=document.getElementById('crmArea');
   if (!crmList.length) { area.innerHTML='<div class="state-box"><div class="state-icon">&#128101;</div><div class="state-title">Your list is empty</div><div class="state-desc">Search for prospects and click "Add to List" to start tracking them here.</div></div>'; return; }
-  var html='<div class="crm-table-wrap"><table><thead><tr><th>Business</th><th>Contact</th><th>Email</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>';
-  for (var i=0;i<crmList.length;i++) {
-    var c=crmList[i]; var s=c.status;
-    html+='<tr>';
+  var list = getFilteredList();
+  // Sort: starred first within the filtered list
+  list.sort(function(a,b){ return (b.starred?1:0) - (a.starred?1:0); });
+  if (!list.length) {
+    area.innerHTML='<div class="state-box"><div class="state-title">No prospects match this filter.</div><div class="state-desc">Try a different filter or add more prospects.</div></div>';
+    return;
+  }
+  var html='<div class="crm-table-wrap"><table><thead><tr><th></th><th>Business</th><th>Contact</th><th>Email</th><th>Rating</th><th>Hours</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>';
+  for (var i=0;i<list.length;i++) {
+    var c=list[i]; var s=c.status;
+    html+='<tr class="'+(c.starred?'starred-row':'')+'">';
+    html+='<td style="padding-right:0;width:36px"><button class="star-btn '+(c.starred?'starred':'')+'" onclick="toggleStar('+c.id+')" title="'+(c.starred?'Unstar':'Star this prospect')+'">'+(c.starred?'\u2605':'\u2606')+'</button></td>';
     html+='<td class="name-cell"><a href="'+c.mapsUrl+'" target="_blank">'+c.title+' &#8599;</a>';
     if(c.address) html+='<div style="font-size:11px;color:var(--text-faint);font-weight:400;margin-top:2px">'+c.address+'</div>';
     html+='<div style="margin-top:4px"><span class="badge '+c.websiteType+'">'+badgeLabel(c.websiteType)+'</span></div></td>';
@@ -365,6 +494,22 @@ function renderCRM() {
     if(!c.phone&&!c.website) html+='<span style="color:var(--text-faint);font-size:12px">—</span>';
     html+='</td>';
     html+='<td><input class="email-input" type="email" placeholder="Add email..." value="'+escapeHtml(c.email||'')+'" onchange="updateEmail('+c.id+',this.value)"></td>';
+    html+='<td class="rating-cell">';
+    if (c.rating) {
+      html+=starsHtml(c.rating);
+      if (c.reviews) html+='<div class="review-count">'+c.reviews+' reviews</div>';
+    } else {
+      html+='<span style="color:var(--text-faint);font-style:italic;font-size:11px">No rating</span>';
+    }
+    html+='</td>';
+    var hoursPreview = formatHoursPreview(c.hours);
+    html+='<td>';
+    if (hoursPreview) {
+      html+='<div class="hours-preview" onclick="showHoursPopup('+c.id+', event)" title="Click for full hours">'+escapeHtml(hoursPreview)+'</div>';
+    } else {
+      html+='<div class="hours-preview empty">No hours</div>';
+    }
+    html+='</td>';
     html+='<td><div class="status-cell">';
     html+='<button class="status-toggle '+(s.called?'on called':'')+'" onclick="toggleStatus('+c.id+',\'called\')">Called</button>';
     html+='<button class="status-toggle '+(s.callback?'on callback':'')+'" onclick="toggleStatus('+c.id+',\'callback\')">&#128222; Call back</button>';
@@ -390,7 +535,7 @@ function renderCRM() {
 
 function exportCRM() {
   if (!crmList.length) { alert('Nothing to export.'); return; }
-  var rows=[['Business','Address','Phone','Email','Website','Status','Notes','Added']];
+  var rows=[['Starred','Business','Address','Phone','Email','Website','Rating','Reviews','Hours','Status','Notes','Added']];
   crmList.forEach(function(c) {
     var st=[];
     if(c.status.called) st.push('Called');
@@ -399,7 +544,12 @@ function exportCRM() {
     if(c.status.interested) st.push('Interested');
     if(c.status.notInterested) st.push('Not interested');
     if(c.status.closed) st.push('Closed');
-    rows.push(['"'+c.title+'"','"'+(c.address||'')+'"',c.phone||'',c.email||'',c.website||'',st.join(' | '),'"'+(c.notes||'').replace(/"/g,'""').replace(/\n/g,' ')+'"',c.addedAt||'']);
+    var hoursStr = '';
+    if (c.hours) {
+      if (typeof c.hours === 'string') hoursStr = c.hours;
+      else if (typeof c.hours === 'object') hoursStr = Object.keys(c.hours).map(function(k){ return k+': '+c.hours[k]; }).join(' | ');
+    }
+    rows.push([c.starred?'YES':'','"'+c.title+'"','"'+(c.address||'')+'"',c.phone||'',c.email||'',c.website||'',c.rating||'',c.reviews||'','"'+hoursStr.replace(/"/g,'""')+'"',st.join(' | '),'"'+(c.notes||'').replace(/"/g,'""').replace(/\n/g,' ')+'"',c.addedAt||'']);
   });
   var csv=rows.map(function(r){ return r.join(','); }).join('\n');
   var a=document.createElement('a');
@@ -474,7 +624,7 @@ async function runSearch() {
     if(data.error) throw new Error(data.error);
     var results=data.local_results||[];
     if(!results.length) { document.getElementById('resultsArea').innerHTML='<div class="state-box"><div class="state-icon">&#128235;</div><div class="state-title">No results found</div><div class="state-desc">Try a different term or broader location.</div></div>'; btn.disabled=false; btn.textContent='Search \u2192'; return; }
-    allResults=results.map(function(r){ return {title:r.title||'Unknown',address:r.address||'',phone:r.phone||'',website:r.website||null,rating:r.rating||null,reviews:r.reviews||null,type:r.type||'',websiteType:classifyWebsite(r.website)}; }).sort(function(a,b){ return sortOrder(a.websiteType)-sortOrder(b.websiteType); });
+    allResults=results.map(function(r){ return {title:r.title||'Unknown',address:r.address||'',phone:r.phone||'',website:r.website||null,rating:r.rating||null,reviews:r.reviews||null,type:r.type||'',hours:r.hours||r.operating_hours||r.opening_hours||null,websiteType:classifyWebsite(r.website)}; }).sort(function(a,b){ return sortOrder(a.websiteType)-sortOrder(b.websiteType); });
     updateStats();
     var nw=allResults.filter(function(r){ return r.websiteType==='no-website'; }).length;
     var bw=allResults.filter(function(r){ return r.websiteType==='bad-website'; }).length;
