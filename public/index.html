@@ -55,6 +55,10 @@
   .results-title { font-size: 13px; font-weight: 500; color: var(--text-muted); }
   .action-btn { font-size: 12px; font-weight: 500; color: var(--teal); border: 0.5px solid var(--border-teal); border-radius: 100px; padding: 0.35rem 1rem; cursor: pointer; background: transparent; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
   .action-btn:hover { background: var(--teal-dim); }
+  .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .refresh-btn { font-size: 12px; font-weight: 600; color: var(--bg); background: var(--gold); border: none; border-radius: 100px; padding: 0.4rem 1rem; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap; }
+  .refresh-btn:hover { background: var(--amber); }
+  .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .filter-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
   .filter-tab { font-size: 12px; font-weight: 500; padding: 0.4rem 1rem; border-radius: 100px; border: 0.5px solid var(--border); cursor: pointer; background: transparent; color: var(--text-muted); font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
   .filter-tab.active { background: var(--teal-dim); border-color: var(--border-teal); color: var(--teal); }
@@ -89,9 +93,11 @@
   .state-desc { font-size: 13px; font-weight: 300; line-height: 1.6; max-width: 360px; margin: 0 auto; }
   .spinner { width: 24px; height: 24px; border: 2px solid var(--border-teal); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
   .error-box { background: rgba(248,113,113,0.08); border: 0.5px solid rgba(248,113,113,0.25); border-radius: 10px; padding: 1rem 1.25rem; font-size: 13px; color: var(--red); margin-bottom: 1.5rem; line-height: 1.5; }
+  .progress-box { background: rgba(252,211,77,0.08); border: 0.5px solid rgba(252,211,77,0.3); border-radius: 10px; padding: 1rem 1.25rem; font-size: 13px; color: var(--gold); margin-bottom: 1rem; line-height: 1.5; display: flex; align-items: center; gap: 0.75rem; }
+  .progress-spinner { width: 16px; height: 16px; border: 2px solid rgba(252,211,77,0.3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
   .crm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
   .crm-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); letter-spacing: -0.3px; }
-  .crm-actions { display: flex; gap: 0.5rem; align-items: center; }
+  .crm-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
   .crm-stats { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--border); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
   .crm-stat { background: var(--bg-card); padding: 0.85rem 1rem; text-align: center; }
   .crm-stat-num { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); line-height: 1; margin-bottom: 0.2rem; }
@@ -128,6 +134,9 @@
   .status-toggle.on.callback { background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.3); color: var(--blue); }
   .status-toggle.on.not-interested { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.25); color: var(--red); }
   .status-toggle.on.closed { background: rgba(126,207,173,0.2); border-color: rgba(126,207,173,0.5); color: var(--teal); }
+  .call-history { font-size: 10px; margin-top: 4px; line-height: 1.4; }
+  .call-history.recent { color: var(--amber); }
+  .call-history.old { color: var(--text-faint); }
   .notes-cell { min-width: 200px; max-width: 280px; }
   .notes-preview { font-size: 12px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; padding: 0.5rem 0.7rem; border: 0.5px solid var(--border); border-radius: 6px; cursor: pointer; transition: all 0.15s; min-height: 32px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .notes-preview:hover { border-color: var(--border-teal); background: var(--bg-mid); color: var(--text); }
@@ -226,9 +235,14 @@
     <div class="crm-header">
       <div class="crm-title">My Prospect List</div>
       <div class="crm-actions">
+        <button class="refresh-btn" id="refreshBtn" onclick="refreshAllProspects()">&#8635; Refresh Google data</button>
         <button class="action-btn" onclick="exportCRM()">Export CSV</button>
         <button class="action-btn" onclick="clearCRM()" style="color:var(--red);border-color:rgba(248,113,113,0.3)">Clear all</button>
       </div>
+    </div>
+    <div class="progress-box" id="progressBox" style="display:none">
+      <div class="progress-spinner"></div>
+      <span id="progressText">Refreshing...</span>
     </div>
     <div class="crm-stats">
       <div class="crm-stat"><div class="crm-stat-num" id="crmTotal">0</div><div class="crm-stat-label">Total</div></div>
@@ -261,7 +275,6 @@ var allResults = [];
 var crmList = JSON.parse(localStorage.getItem('thira_crm') || '[]');
 var crmFilter = 'all';
 
-// Migrate older records to include new fields
 crmList.forEach(function(c){
   if(c.status && typeof c.status.callback === 'undefined') c.status.callback = false;
   if(typeof c.email === 'undefined') c.email = '';
@@ -269,6 +282,7 @@ crmList.forEach(function(c){
   if(typeof c.reviews === 'undefined') c.reviews = null;
   if(typeof c.hours === 'undefined') c.hours = null;
   if(typeof c.starred === 'undefined') c.starred = false;
+  if(typeof c.callHistory === 'undefined') c.callHistory = [];
 });
 
 function saveCRM() { localStorage.setItem('thira_crm', JSON.stringify(crmList)); updateCRMCount(); }
@@ -343,6 +357,24 @@ function formatFullHours(hours) {
   return 'No hours available';
 }
 
+function formatTimeAgo(ts) {
+  if (!ts) return '';
+  var diff = Date.now() - ts;
+  var mins = Math.floor(diff/60000);
+  var hrs = Math.floor(diff/3600000);
+  var days = Math.floor(diff/86400000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins+'m ago';
+  if (hrs < 24) return hrs+'h ago';
+  if (days === 1) return 'yesterday';
+  if (days < 7) return days+'d ago';
+  return Math.floor(days/7)+'w ago';
+}
+
+function normalizeTitle(s) {
+  return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+}
+
 function sortOrder(t) { return t==='no-website'?0:t==='bad-website'?1:2; }
 function mapsUrl(n, a) { return 'https://www.google.com/maps/search/'+encodeURIComponent(n+' '+a); }
 function isInCRM(title, address) { return crmList.some(function(c){ return c.title===title&&c.address===address; }); }
@@ -350,7 +382,7 @@ function isInCRM(title, address) { return crmList.some(function(c){ return c.tit
 function addToCRM(idx) {
   var r = allResults[idx];
   if (isInCRM(r.title, r.address)) return;
-  crmList.push({ id:Date.now(), title:r.title, address:r.address, phone:r.phone, email:'', website:r.website, websiteType:r.websiteType, rating:r.rating, reviews:r.reviews, hours:r.hours, starred:false, mapsUrl:mapsUrl(r.title,r.address), status:{called:false,callback:false,emailed:false,interested:false,notInterested:false,closed:false}, notes:'', addedAt:new Date().toLocaleDateString() });
+  crmList.push({ id:Date.now(), title:r.title, address:r.address, phone:r.phone, email:'', website:r.website, websiteType:r.websiteType, rating:r.rating, reviews:r.reviews, hours:r.hours, starred:false, callHistory:[], mapsUrl:mapsUrl(r.title,r.address), status:{called:false,callback:false,emailed:false,interested:false,notInterested:false,closed:false}, notes:'', addedAt:new Date().toLocaleDateString() });
   saveCRM();
   var btn = document.getElementById('addbtn_'+idx);
   if (btn) { btn.textContent='\u2713 Added'; btn.classList.add('added'); btn.disabled=true; }
@@ -361,6 +393,10 @@ function toggleStatus(id, key) {
   if (!item) return;
   if (key==='interested'&&!item.status.interested) item.status.notInterested=false;
   if (key==='notInterested'&&!item.status.notInterested) item.status.interested=false;
+  if (key==='called' && !item.status.called) {
+    if (!item.callHistory) item.callHistory = [];
+    item.callHistory.push(Date.now());
+  }
   item.status[key] = !item.status[key];
   saveCRM(); renderCRM();
 }
@@ -441,6 +477,47 @@ function escapeHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+async function refreshAllProspects() {
+  if (!crmList.length) { alert('No prospects to refresh.'); return; }
+  if (!confirm('This will use '+crmList.length+' SerpApi searches to refresh rating, reviews, and hours for all prospects. Continue?')) return;
+  var btn = document.getElementById('refreshBtn');
+  var box = document.getElementById('progressBox');
+  var txt = document.getElementById('progressText');
+  btn.disabled = true;
+  box.style.display = 'flex';
+  var matched = 0, failed = 0;
+  for (var i = 0; i < crmList.length; i++) {
+    var c = crmList[i];
+    txt.textContent = 'Refreshing '+(i+1)+' of '+crmList.length+': '+c.title;
+    try {
+      var q = encodeURIComponent(c.title + ' ' + (c.address||''));
+      var res = await fetch('/search?q=' + q);
+      var data = await res.json();
+      var results = data.local_results || (data.place_results ? [data.place_results] : []);
+      if (results.length) {
+        var normTarget = normalizeTitle(c.title);
+        var match = results[0];
+        for (var j = 0; j < results.length; j++) {
+          if (normalizeTitle(results[j].title).indexOf(normTarget) > -1 || normTarget.indexOf(normalizeTitle(results[j].title)) > -1) {
+            match = results[j]; break;
+          }
+        }
+        if (match.rating) c.rating = match.rating;
+        if (match.reviews) c.reviews = match.reviews;
+        var h = match.operating_hours || match.hours || null;
+        if (h) c.hours = h;
+        if (match.phone && !c.phone) c.phone = match.phone;
+        matched++;
+      } else { failed++; }
+    } catch(e) { failed++; }
+  }
+  saveCRM();
+  box.style.display = 'none';
+  btn.disabled = false;
+  renderCRM();
+  alert('Done. Refreshed '+matched+' prospects. '+failed+' could not be matched.');
+}
+
 function deleteFromCRM(id) { crmList=crmList.filter(function(c){ return c.id!==id; }); saveCRM(); renderCRM(); }
 
 function clearCRM() {
@@ -474,7 +551,6 @@ function renderCRM() {
   var area=document.getElementById('crmArea');
   if (!crmList.length) { area.innerHTML='<div class="state-box"><div class="state-icon">&#128101;</div><div class="state-title">Your list is empty</div><div class="state-desc">Search for prospects and click "Add to List" to start tracking them here.</div></div>'; return; }
   var list = getFilteredList();
-  // Sort: starred first within the filtered list
   list.sort(function(a,b){ return (b.starred?1:0) - (a.starred?1:0); });
   if (!list.length) {
     area.innerHTML='<div class="state-box"><div class="state-title">No prospects match this filter.</div><div class="state-desc">Try a different filter or add more prospects.</div></div>';
@@ -483,6 +559,7 @@ function renderCRM() {
   var html='<div class="crm-table-wrap"><table><thead><tr><th></th><th>Business</th><th>Contact</th><th>Email</th><th>Rating</th><th>Hours</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>';
   for (var i=0;i<list.length;i++) {
     var c=list[i]; var s=c.status;
+    var ch = c.callHistory || [];
     html+='<tr class="'+(c.starred?'starred-row':'')+'">';
     html+='<td style="padding-right:0;width:36px"><button class="star-btn '+(c.starred?'starred':'')+'" onclick="toggleStar('+c.id+')" title="'+(c.starred?'Unstar':'Star this prospect')+'">'+(c.starred?'\u2605':'\u2606')+'</button></td>';
     html+='<td class="name-cell"><a href="'+c.mapsUrl+'" target="_blank">'+c.title+' &#8599;</a>';
@@ -517,7 +594,13 @@ function renderCRM() {
     html+='<button class="status-toggle '+(s.interested?'on interested':'')+'" onclick="toggleStatus('+c.id+',\'interested\')">Interested</button>';
     html+='<button class="status-toggle '+(s.notInterested?'on not-interested':'')+'" onclick="toggleStatus('+c.id+',\'notInterested\')">Not interested</button>';
     html+='<button class="status-toggle '+(s.closed?'on closed':'')+'" onclick="toggleStatus('+c.id+',\'closed\')">&#127881; Closed</button>';
-    html+='</div></td>';
+    html+='</div>';
+    if (ch.length > 0) {
+      var lastCall = ch[ch.length-1];
+      var isRecent = (Date.now() - lastCall) < 86400000;
+      html+='<div class="call-history '+(isRecent?'recent':'old')+'">'+ch.length+' call'+(ch.length>1?'s':'')+' &middot; last '+formatTimeAgo(lastCall)+'</div>';
+    }
+    html+='</td>';
     var notesContent = (c.notes||'').trim();
     html+='<td class="notes-cell"><div id="notes_wrap_'+c.id+'">';
     if (notesContent) {
@@ -535,7 +618,7 @@ function renderCRM() {
 
 function exportCRM() {
   if (!crmList.length) { alert('Nothing to export.'); return; }
-  var rows=[['Starred','Business','Address','Phone','Email','Website','Rating','Reviews','Hours','Status','Notes','Added']];
+  var rows=[['Starred','Business','Address','Phone','Email','Website','Rating','Reviews','Hours','Status','Call Count','Last Called','Notes','Added']];
   crmList.forEach(function(c) {
     var st=[];
     if(c.status.called) st.push('Called');
@@ -549,7 +632,9 @@ function exportCRM() {
       if (typeof c.hours === 'string') hoursStr = c.hours;
       else if (typeof c.hours === 'object') hoursStr = Object.keys(c.hours).map(function(k){ return k+': '+c.hours[k]; }).join(' | ');
     }
-    rows.push([c.starred?'YES':'','"'+c.title+'"','"'+(c.address||'')+'"',c.phone||'',c.email||'',c.website||'',c.rating||'',c.reviews||'','"'+hoursStr.replace(/"/g,'""')+'"',st.join(' | '),'"'+(c.notes||'').replace(/"/g,'""').replace(/\n/g,' ')+'"',c.addedAt||'']);
+    var ch = c.callHistory || [];
+    var lastCalled = ch.length ? new Date(ch[ch.length-1]).toLocaleString() : '';
+    rows.push([c.starred?'YES':'','"'+c.title+'"','"'+(c.address||'')+'"',c.phone||'',c.email||'',c.website||'',c.rating||'',c.reviews||'','"'+hoursStr.replace(/"/g,'""')+'"',st.join(' | '),ch.length,'"'+lastCalled+'"','"'+(c.notes||'').replace(/"/g,'""').replace(/\n/g,' ')+'"',c.addedAt||'']);
   });
   var csv=rows.map(function(r){ return r.join(','); }).join('\n');
   var a=document.createElement('a');
