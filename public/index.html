@@ -19,7 +19,7 @@
   .logo { font-size: 18px; font-weight: 500; color: var(--teal); letter-spacing: -0.3px; }
   .logo-sub { font-size: 11px; color: var(--text-faint); letter-spacing: 1.5px; text-transform: uppercase; margin-left: 0.75rem; }
   .header-badge { font-size: 11px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: var(--teal); border: 0.5px solid var(--border-teal); padding: 0.3rem 0.8rem; border-radius: 100px; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+  .container { max-width: 1600px; margin: 0 auto; padding: 2rem; }
   .main-tabs { display: flex; gap: 0; margin-bottom: 2rem; border-bottom: 0.5px solid var(--border); }
   .main-tab { font-size: 13px; font-weight: 500; padding: 0.75rem 1.5rem; cursor: pointer; background: transparent; color: var(--text-muted); border: none; font-family: 'DM Sans', sans-serif; border-bottom: 2px solid transparent; transition: all 0.2s; position: relative; bottom: -0.5px; }
   .main-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
@@ -110,7 +110,7 @@
   .crm-filter.active.starred { background: rgba(252,211,77,0.12); border-color: rgba(252,211,77,0.4); color: var(--gold); }
   .crm-filter:hover:not(.active) { border-color: var(--border-teal); color: var(--text); }
   .crm-table-wrap { border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; min-width: 1150px; }
+  table { width: 100%; border-collapse: collapse; min-width: 1400px; }
   thead tr { background: var(--bg-mid); border-bottom: 0.5px solid var(--border); }
   th { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-faint); padding: 0.85rem 1rem; text-align: left; white-space: nowrap; }
   tbody tr { border-bottom: 0.5px solid var(--border); transition: background 0.15s; }
@@ -152,7 +152,7 @@
   .rating-cell .review-count { font-size: 11px; color: var(--text-faint); }
   .hours-preview { font-size: 11px; color: var(--text-muted); padding: 0.35rem 0.55rem; border: 0.5px solid var(--border); border-radius: 6px; cursor: pointer; transition: all 0.15s; min-width: 110px; max-width: 180px; line-height: 1.3; }
   .hours-preview:hover { border-color: var(--border-teal); background: var(--bg-mid); color: var(--text); }
-  .hours-preview.empty { color: var(--text-faint); font-style: italic; }
+  .hours-preview.empty { color: var(--text-faint); font-style: italic; cursor: default; }
   .hours-popup { position: absolute; background: var(--bg-mid); border: 0.5px solid var(--border-teal); border-radius: 8px; padding: 0.75rem 1rem; font-size: 11px; color: var(--text); z-index: 100; min-width: 200px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); line-height: 1.6; }
   .hours-popup div { white-space: nowrap; }
   .hours-popup .day { color: var(--teal); font-weight: 500; margin-right: 8px; display: inline-block; min-width: 36px; }
@@ -318,43 +318,71 @@ function starsHtml(r) {
   return '<span class="stars">'+s+' '+r+'</span>';
 }
 
-function formatHoursPreview(hours) {
+// Normalise hours into a consistent {day: string} object regardless of input format
+function normaliseHours(hours) {
   if (!hours) return null;
+  // Already a simple string like "Opens at 9 AM"
   if (typeof hours === 'string') return hours;
-  if (typeof hours === 'object') {
-    var days = Object.keys(hours);
-    if (!days.length) return null;
-    var dayMap = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
-    var todayKey = dayMap[new Date().getDay()];
-    var today = null;
-    for (var i=0;i<days.length;i++){
-      if (days[i].toLowerCase().indexOf(todayKey)===0) { today = days[i]; break; }
-    }
-    if (today) return 'Today: '+hours[today];
-    return days[0]+': '+hours[days[0]];
+  // Keyed object like {monday: "9am-5pm", tuesday: "9am-5pm"}
+  if (typeof hours === 'object' && !Array.isArray(hours)) {
+    // Check values are strings not objects
+    var keys = Object.keys(hours);
+    if (!keys.length) return null;
+    var firstVal = hours[keys[0]];
+    if (typeof firstVal === 'string') return hours;
+    // Values are objects themselves e.g. {monday: {hours: "9-5"}}
+    var result = {};
+    keys.forEach(function(k){
+      var v = hours[k];
+      if (typeof v === 'string') result[k] = v;
+      else if (v && typeof v === 'object') result[k] = v.hours || v.time || v.open || JSON.stringify(v);
+      else result[k] = String(v);
+    });
+    return result;
+  }
+  // Array format like [{day: "Monday", hours: "9am-5pm"}]
+  if (Array.isArray(hours)) {
+    var result = {};
+    hours.forEach(function(item){
+      if (!item || typeof item !== 'object') return;
+      var day = item.day || item.name || item.weekday || '';
+      var time = item.hours || item.time || item.open_now || item.times || '';
+      if (typeof time === 'object') time = JSON.stringify(time);
+      if (day) result[String(day).toLowerCase()] = String(time);
+    });
+    return Object.keys(result).length ? result : null;
   }
   return null;
 }
 
-function formatFullHours(hours) {
-  if (!hours) return 'No hours available';
-  if (typeof hours === 'string') return hours;
-  if (typeof hours === 'object') {
-    var out = '';
-    var order = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
-    var keys = Object.keys(hours);
-    keys.sort(function(a,b){
-      var ai = order.findIndex(function(d){ return a.toLowerCase().indexOf(d)===0; });
-      var bi = order.findIndex(function(d){ return b.toLowerCase().indexOf(d)===0; });
-      return (ai===-1?99:ai) - (bi===-1?99:bi);
-    });
-    keys.forEach(function(k){
-      var label = k.charAt(0).toUpperCase()+k.slice(1,3);
-      out += '<div><span class="day">'+label+'</span>'+escapeHtml(String(hours[k]))+'</div>';
-    });
-    return out;
+function formatHoursPreview(hours) {
+  var h = normaliseHours(hours);
+  if (!h) return null;
+  if (typeof h === 'string') return h;
+  var dayMap = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+  var todayKey = dayMap[new Date().getDay()];
+  var keys = Object.keys(h);
+  for (var i=0; i<keys.length; i++) {
+    if (keys[i].toLowerCase().indexOf(todayKey) === 0) return 'Today: '+h[keys[i]];
   }
-  return 'No hours available';
+  return keys[0]+': '+h[keys[0]];
+}
+
+function formatFullHours(hours) {
+  var h = normaliseHours(hours);
+  if (!h) return 'No hours available';
+  if (typeof h === 'string') return escapeHtml(h);
+  var order = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+  var keys = Object.keys(h);
+  keys.sort(function(a,b){
+    var ai = order.findIndex(function(d){ return a.toLowerCase().indexOf(d)===0; });
+    var bi = order.findIndex(function(d){ return b.toLowerCase().indexOf(d)===0; });
+    return (ai===-1?99:ai) - (bi===-1?99:bi);
+  });
+  return keys.map(function(k){
+    var label = k.charAt(0).toUpperCase()+k.slice(1,3);
+    return '<div><span class="day">'+escapeHtml(label)+'</span>'+escapeHtml(String(h[k]))+'</div>';
+  }).join('');
 }
 
 function formatTimeAgo(ts) {
@@ -627,10 +655,11 @@ function exportCRM() {
     if(c.status.interested) st.push('Interested');
     if(c.status.notInterested) st.push('Not interested');
     if(c.status.closed) st.push('Closed');
+    var h = normaliseHours(c.hours);
     var hoursStr = '';
-    if (c.hours) {
-      if (typeof c.hours === 'string') hoursStr = c.hours;
-      else if (typeof c.hours === 'object') hoursStr = Object.keys(c.hours).map(function(k){ return k+': '+c.hours[k]; }).join(' | ');
+    if (h) {
+      if (typeof h === 'string') hoursStr = h;
+      else hoursStr = Object.keys(h).map(function(k){ return k+': '+h[k]; }).join(' | ');
     }
     var ch = c.callHistory || [];
     var lastCalled = ch.length ? new Date(ch[ch.length-1]).toLocaleString() : '';
@@ -709,7 +738,7 @@ async function runSearch() {
     if(data.error) throw new Error(data.error);
     var results=data.local_results||[];
     if(!results.length) { document.getElementById('resultsArea').innerHTML='<div class="state-box"><div class="state-icon">&#128235;</div><div class="state-title">No results found</div><div class="state-desc">Try a different term or broader location.</div></div>'; btn.disabled=false; btn.textContent='Search \u2192'; return; }
-    allResults=results.map(function(r){ return {title:r.title||'Unknown',address:r.address||'',phone:r.phone||'',website:r.website||null,rating:r.rating||null,reviews:r.reviews||null,type:r.type||'',hours:r.hours||r.operating_hours||r.opening_hours||null,websiteType:classifyWebsite(r.website)}; }).sort(function(a,b){ return sortOrder(a.websiteType)-sortOrder(b.websiteType); });
+    allResults=results.map(function(r){ return {title:r.title||'Unknown',address:r.address||'',phone:r.phone||'',website:r.website||null,rating:r.rating||null,reviews:r.reviews||null,type:r.type||'',hours:r.operating_hours||r.hours||r.opening_hours||null,websiteType:classifyWebsite(r.website)}; }).sort(function(a,b){ return sortOrder(a.websiteType)-sortOrder(b.websiteType); });
     updateStats();
     var nw=allResults.filter(function(r){ return r.websiteType==='no-website'; }).length;
     var bw=allResults.filter(function(r){ return r.websiteType==='bad-website'; }).length;
