@@ -95,16 +95,29 @@
   .error-box { background: rgba(248,113,113,0.08); border: 0.5px solid rgba(248,113,113,0.25); border-radius: 10px; padding: 1rem 1.25rem; font-size: 13px; color: var(--red); margin-bottom: 1.5rem; line-height: 1.5; }
   .progress-box { background: rgba(252,211,77,0.08); border: 0.5px solid rgba(252,211,77,0.3); border-radius: 10px; padding: 1rem 1.25rem; font-size: 13px; color: var(--gold); margin-bottom: 1rem; line-height: 1.5; display: flex; align-items: center; gap: 0.75rem; }
   .progress-spinner { width: 16px; height: 16px; border: 2px solid rgba(252,211,77,0.3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
-  .crm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+  .crm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
   .crm-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); letter-spacing: -0.3px; }
   .crm-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
-  .crm-stats { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--border); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem; }
+  .crm-search-bar { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
+  .crm-search-input { background: var(--bg-mid); border: 0.5px solid var(--border); border-radius: 8px; padding: 0.6rem 1rem; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; transition: border-color 0.2s; flex: 1; max-width: 360px; }
+  .crm-search-input::placeholder { color: var(--text-faint); }
+  .crm-search-input:focus { border-color: var(--border-teal); }
+  .industry-filter-bar { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.75rem; align-items: center; }
+  .industry-label { font-size: 10px; color: var(--text-faint); letter-spacing: 1px; text-transform: uppercase; margin-right: 0.25rem; }
+  .industry-pill { font-size: 11px; font-weight: 500; padding: 0.3rem 0.8rem; border-radius: 100px; border: 0.5px solid var(--border); cursor: pointer; background: transparent; color: var(--text-muted); font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap; }
+  .industry-pill:hover { border-color: var(--border-teal); color: var(--text); }
+  .industry-pill.active { background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.35); color: var(--blue); }
+  .industry-tag { display: inline-block; font-size: 9px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; padding: 0.15rem 0.5rem; border-radius: 100px; background: rgba(96,165,250,0.1); border: 0.5px solid rgba(96,165,250,0.25); color: var(--blue); margin-top: 3px; }
+  .industry-select { background: var(--bg); border: 0.5px solid var(--border); border-radius: 6px; padding: 0.3rem 0.5rem; font-size: 11px; font-family: 'DM Sans', sans-serif; color: var(--text-muted); outline: none; cursor: pointer; transition: border-color 0.15s; }
+  .industry-select:hover { border-color: var(--border-teal); }
+  .industry-select:focus { border-color: var(--teal); color: var(--text); }
+  .crm-stats { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--border); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1rem; }
   .crm-stat { background: var(--bg-card); padding: 0.85rem 1rem; text-align: center; }
   .crm-stat-num { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); line-height: 1; margin-bottom: 0.2rem; }
   .crm-stat-num.blue { color: var(--blue); }
   .crm-stat-num.gold { color: var(--gold); }
   .crm-stat-label { font-size: 10px; color: var(--text-faint); letter-spacing: 1px; text-transform: uppercase; }
-  .crm-filter-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .crm-filter-bar { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
   .crm-filter { font-size: 11px; font-weight: 500; padding: 0.35rem 0.9rem; border-radius: 100px; border: 0.5px solid var(--border); cursor: pointer; background: transparent; color: var(--text-muted); font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
   .crm-filter.active { background: var(--teal-dim); border-color: var(--border-teal); color: var(--teal); }
   .crm-filter.active.starred { background: rgba(252,211,77,0.12); border-color: rgba(252,211,77,0.4); color: var(--gold); }
@@ -158,6 +171,7 @@
   .hours-popup .day { color: var(--teal); font-weight: 500; margin-right: 8px; display: inline-block; min-width: 36px; }
   .delete-btn { font-size: 18px; color: var(--text-faint); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; transition: color 0.15s; line-height: 1; }
   .delete-btn:hover { color: var(--red); }
+  .results-count { font-size: 12px; color: var(--text-faint); margin-bottom: 0.75rem; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   @media (max-width: 700px) { .form-row { grid-template-columns: 1fr; } .stats-bar { grid-template-columns: repeat(2,1fr); } .result-card { grid-template-columns: 1fr; } .result-right { align-items: flex-start; flex-direction: row; flex-wrap: wrap; } .crm-stats { grid-template-columns: repeat(3,1fr); } }
@@ -253,13 +267,25 @@
       <div class="crm-stat"><div class="crm-stat-num" id="crmInterested">0</div><div class="crm-stat-label">Interested</div></div>
       <div class="crm-stat"><div class="crm-stat-num" id="crmClosed">0</div><div class="crm-stat-label">Closed</div></div>
     </div>
-    <div class="crm-filter-bar" id="crmFilterBar" style="display:none">
-      <button class="crm-filter active" data-filter="all" onclick="setCRMFilter('all')">All</button>
-      <button class="crm-filter" data-filter="starred" onclick="setCRMFilter('starred')">&#9733; Starred only</button>
-      <button class="crm-filter" data-filter="callback" onclick="setCRMFilter('callback')">&#128222; Call back</button>
-      <button class="crm-filter" data-filter="interested" onclick="setCRMFilter('interested')">Interested</button>
-      <button class="crm-filter" data-filter="uncalled" onclick="setCRMFilter('uncalled')">Not yet called</button>
+
+    <!-- Search + Industry filters -->
+    <div id="crmControls" style="display:none">
+      <div class="crm-search-bar">
+        <input class="crm-search-input" type="text" id="crmSearchInput" placeholder="&#128269; Search by name, address, phone or notes..." oninput="renderCRM()">
+      </div>
+      <div class="industry-filter-bar" id="industryFilterBar">
+        <span class="industry-label">Industry:</span>
+        <button class="industry-pill active" data-industry="all" onclick="setIndustryFilter('all')">All</button>
+      </div>
+      <div class="crm-filter-bar" id="crmFilterBar">
+        <button class="crm-filter active" data-filter="all" onclick="setCRMFilter('all')">All</button>
+        <button class="crm-filter" data-filter="starred" onclick="setCRMFilter('starred')">&#9733; Starred only</button>
+        <button class="crm-filter" data-filter="callback" onclick="setCRMFilter('callback')">&#128222; Call back</button>
+        <button class="crm-filter" data-filter="interested" onclick="setCRMFilter('interested')">Interested</button>
+        <button class="crm-filter" data-filter="uncalled" onclick="setCRMFilter('uncalled')">Not yet called</button>
+      </div>
     </div>
+
     <div id="crmArea">
       <div class="state-box">
         <div class="state-icon">&#128101;</div>
@@ -274,6 +300,46 @@
 var allResults = [];
 var crmList = JSON.parse(localStorage.getItem('thira_crm') || '[]');
 var crmFilter = 'all';
+var industryFilter = 'all';
+
+var INDUSTRIES = [
+  'Carpenter','Electrician','Plumber','Plasterer','Tiler','Roofer',
+  'Painter','Decorator','Landscaper','Builder','Florist','Cleaning',
+  'Joiner','Glazier','Locksmith','Gas Engineer','Kitchen Fitter',
+  'Bathroom Fitter','Handyman','Other'
+];
+
+var INDUSTRY_KEYWORDS = {
+  'Carpenter': ['carpenter','carpentry','joinery','joiner','cabinet','woodwork','bespoke fit','bespoke furniture'],
+  'Electrician': ['electric','electrical','sparks','sparky','wiring','fuse'],
+  'Plumber': ['plumb','boiler','heating','drainage','pipe'],
+  'Plasterer': ['plaster','rendering','render'],
+  'Tiler': ['til','tiling'],
+  'Roofer': ['roof','roofing','gutter'],
+  'Painter': ['paint','decorat','decorator'],
+  'Landscaper': ['landscape','garden','landscaping','paving','driveway','turf','lawn'],
+  'Builder': ['build','construction','brickwork','extension','groundwork'],
+  'Florist': ['florist','flower','floral'],
+  'Cleaning': ['clean','domestic','office clean','window clean'],
+  'Joiner': ['joiner','joinery'],
+  'Glazier': ['glaz','glass','window','double glaz'],
+  'Locksmith': ['locksmith','lock'],
+  'Gas Engineer': ['gas','boiler','heating engineer','gas safe'],
+  'Kitchen Fitter': ['kitchen'],
+  'Bathroom Fitter': ['bathroom'],
+  'Handyman': ['handyman','odd job','maintenance']
+};
+
+function detectIndustry(title, typeStr) {
+  var combined = ((title||'') + ' ' + (typeStr||'')).toLowerCase();
+  for (var ind in INDUSTRY_KEYWORDS) {
+    var keywords = INDUSTRY_KEYWORDS[ind];
+    for (var k = 0; k < keywords.length; k++) {
+      if (combined.indexOf(keywords[k]) > -1) return ind;
+    }
+  }
+  return 'Other';
+}
 
 crmList.forEach(function(c){
   if(c.status && typeof c.status.callback === 'undefined') c.status.callback = false;
@@ -283,6 +349,7 @@ crmList.forEach(function(c){
   if(typeof c.hours === 'undefined') c.hours = null;
   if(typeof c.starred === 'undefined') c.starred = false;
   if(typeof c.callHistory === 'undefined') c.callHistory = [];
+  if(typeof c.industry === 'undefined') c.industry = detectIndustry(c.title, c.type||'');
 });
 
 function saveCRM() { localStorage.setItem('thira_crm', JSON.stringify(crmList)); updateCRMCount(); }
@@ -318,19 +385,14 @@ function starsHtml(r) {
   return '<span class="stars">'+s+' '+r+'</span>';
 }
 
-// Normalise hours into a consistent {day: string} object regardless of input format
 function normaliseHours(hours) {
   if (!hours) return null;
-  // Already a simple string like "Opens at 9 AM"
   if (typeof hours === 'string') return hours;
-  // Keyed object like {monday: "9am-5pm", tuesday: "9am-5pm"}
   if (typeof hours === 'object' && !Array.isArray(hours)) {
-    // Check values are strings not objects
     var keys = Object.keys(hours);
     if (!keys.length) return null;
     var firstVal = hours[keys[0]];
     if (typeof firstVal === 'string') return hours;
-    // Values are objects themselves e.g. {monday: {hours: "9-5"}}
     var result = {};
     keys.forEach(function(k){
       var v = hours[k];
@@ -340,7 +402,6 @@ function normaliseHours(hours) {
     });
     return result;
   }
-  // Array format like [{day: "Monday", hours: "9am-5pm"}]
   if (Array.isArray(hours)) {
     var result = {};
     hours.forEach(function(item){
@@ -399,18 +460,46 @@ function formatTimeAgo(ts) {
   return Math.floor(days/7)+'w ago';
 }
 
-function normalizeTitle(s) {
-  return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
-}
-
+function normalizeTitle(s) { return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
 function sortOrder(t) { return t==='no-website'?0:t==='bad-website'?1:2; }
 function mapsUrl(n, a) { return 'https://www.google.com/maps/search/'+encodeURIComponent(n+' '+a); }
 function isInCRM(title, address) { return crmList.some(function(c){ return c.title===title&&c.address===address; }); }
 
+function getUsedIndustries() {
+  var used = {};
+  crmList.forEach(function(c){ if(c.industry) used[c.industry] = true; });
+  return Object.keys(used).sort();
+}
+
+function rebuildIndustryPills() {
+  var bar = document.getElementById('industryFilterBar');
+  if (!bar) return;
+  var used = getUsedIndustries();
+  var html = '<span class="industry-label">Industry:</span>';
+  html += '<button class="industry-pill'+(industryFilter==='all'?' active':'')+'" data-industry="all" onclick="setIndustryFilter(\'all\')">All ('+crmList.length+')</button>';
+  used.forEach(function(ind){
+    var count = crmList.filter(function(c){ return c.industry === ind; }).length;
+    html += '<button class="industry-pill'+(industryFilter===ind?' active':'')+'" data-industry="'+escapeHtml(ind)+'" onclick="setIndustryFilter(\''+escapeHtml(ind)+'\')">'+escapeHtml(ind)+' ('+count+')</button>';
+  });
+  bar.innerHTML = html;
+}
+
+function setIndustryFilter(ind) {
+  industryFilter = ind;
+  rebuildIndustryPills();
+  renderCRM();
+}
+
+function updateIndustry(id, val) {
+  var item = crmList.find(function(c){ return c.id===id; });
+  if (item) { item.industry = val; saveCRM(); rebuildIndustryPills(); renderCRM(); }
+}
+
 function addToCRM(idx) {
   var r = allResults[idx];
   if (isInCRM(r.title, r.address)) return;
-  crmList.push({ id:Date.now(), title:r.title, address:r.address, phone:r.phone, email:'', website:r.website, websiteType:r.websiteType, rating:r.rating, reviews:r.reviews, hours:r.hours, starred:false, callHistory:[], mapsUrl:mapsUrl(r.title,r.address), status:{called:false,callback:false,emailed:false,interested:false,notInterested:false,closed:false}, notes:'', addedAt:new Date().toLocaleDateString() });
+  var industry = detectIndustry(r.title, r.type||'');
+  crmList.push({ id:Date.now(), title:r.title, address:r.address, phone:r.phone, email:'', website:r.website, websiteType:r.websiteType, rating:r.rating, reviews:r.reviews, hours:r.hours, starred:false, callHistory:[], industry:industry, mapsUrl:mapsUrl(r.title,r.address), status:{called:false,callback:false,emailed:false,interested:false,notInterested:false,closed:false}, notes:'', addedAt:new Date().toLocaleDateString() });
   saveCRM();
   var btn = document.getElementById('addbtn_'+idx);
   if (btn) { btn.textContent='\u2713 Added'; btn.classList.add('added'); btn.disabled=true; }
@@ -546,7 +635,7 @@ async function refreshAllProspects() {
   alert('Done. Refreshed '+matched+' prospects. '+failed+' could not be matched.');
 }
 
-function deleteFromCRM(id) { crmList=crmList.filter(function(c){ return c.id!==id; }); saveCRM(); renderCRM(); }
+function deleteFromCRM(id) { crmList=crmList.filter(function(c){ return c.id!==id; }); saveCRM(); rebuildIndustryPills(); renderCRM(); }
 
 function clearCRM() {
   if (!crmList.length) return;
@@ -554,11 +643,24 @@ function clearCRM() {
 }
 
 function getFilteredList() {
-  if (crmFilter === 'starred') return crmList.filter(function(c){ return c.starred; });
-  if (crmFilter === 'callback') return crmList.filter(function(c){ return c.status.callback; });
-  if (crmFilter === 'interested') return crmList.filter(function(c){ return c.status.interested; });
-  if (crmFilter === 'uncalled') return crmList.filter(function(c){ return !c.status.called && !c.status.notInterested && !c.status.closed; });
-  return crmList;
+  var searchVal = (document.getElementById('crmSearchInput') ? document.getElementById('crmSearchInput').value : '').toLowerCase().trim();
+  var list = crmList;
+  if (crmFilter === 'starred') list = list.filter(function(c){ return c.starred; });
+  else if (crmFilter === 'callback') list = list.filter(function(c){ return c.status.callback; });
+  else if (crmFilter === 'interested') list = list.filter(function(c){ return c.status.interested; });
+  else if (crmFilter === 'uncalled') list = list.filter(function(c){ return !c.status.called && !c.status.notInterested && !c.status.closed; });
+  if (industryFilter !== 'all') list = list.filter(function(c){ return c.industry === industryFilter; });
+  if (searchVal) {
+    list = list.filter(function(c){
+      return (c.title||'').toLowerCase().indexOf(searchVal) > -1 ||
+             (c.address||'').toLowerCase().indexOf(searchVal) > -1 ||
+             (c.phone||'').toLowerCase().indexOf(searchVal) > -1 ||
+             (c.notes||'').toLowerCase().indexOf(searchVal) > -1 ||
+             (c.email||'').toLowerCase().indexOf(searchVal) > -1 ||
+             (c.industry||'').toLowerCase().indexOf(searchVal) > -1;
+    });
+  }
+  return list;
 }
 
 function renderCRM() {
@@ -575,16 +677,22 @@ function renderCRM() {
   document.getElementById('crmEmailed').textContent=emailed;
   document.getElementById('crmInterested').textContent=interested;
   document.getElementById('crmClosed').textContent=closed;
-  document.getElementById('crmFilterBar').style.display = crmList.length ? 'flex' : 'none';
+  var controls = document.getElementById('crmControls');
+  if (controls) controls.style.display = crmList.length ? 'block' : 'none';
+  rebuildIndustryPills();
   var area=document.getElementById('crmArea');
-  if (!crmList.length) { area.innerHTML='<div class="state-box"><div class="state-icon">&#128101;</div><div class="state-title">Your list is empty</div><div class="state-desc">Search for prospects and click "Add to List" to start tracking them here.</div></div>'; return; }
+  if (!crmList.length) {
+    area.innerHTML='<div class="state-box"><div class="state-icon">&#128101;</div><div class="state-title">Your list is empty</div><div class="state-desc">Search for prospects and click "Add to List" to start tracking them here.</div></div>';
+    return;
+  }
   var list = getFilteredList();
   list.sort(function(a,b){ return (b.starred?1:0) - (a.starred?1:0); });
   if (!list.length) {
-    area.innerHTML='<div class="state-box"><div class="state-title">No prospects match this filter.</div><div class="state-desc">Try a different filter or add more prospects.</div></div>';
+    area.innerHTML='<div class="state-box"><div class="state-title">No prospects match your search or filter.</div><div class="state-desc">Try clearing the search or changing the filter.</div></div>';
     return;
   }
-  var html='<div class="crm-table-wrap"><table><thead><tr><th></th><th>Business</th><th>Contact</th><th>Email</th><th>Rating</th><th>Hours</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>';
+  var html='<div class="results-count">Showing '+list.length+' of '+crmList.length+' prospects</div>';
+  html+='<div class="crm-table-wrap"><table><thead><tr><th></th><th>Business</th><th>Industry</th><th>Contact</th><th>Email</th><th>Rating</th><th>Hours</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>';
   for (var i=0;i<list.length;i++) {
     var c=list[i]; var s=c.status;
     var ch = c.callHistory || [];
@@ -593,6 +701,11 @@ function renderCRM() {
     html+='<td class="name-cell"><a href="'+c.mapsUrl+'" target="_blank">'+c.title+' &#8599;</a>';
     if(c.address) html+='<div style="font-size:11px;color:var(--text-faint);font-weight:400;margin-top:2px">'+c.address+'</div>';
     html+='<div style="margin-top:4px"><span class="badge '+c.websiteType+'">'+badgeLabel(c.websiteType)+'</span></div></td>';
+    html+='<td><select class="industry-select" onchange="updateIndustry('+c.id+',this.value)">';
+    INDUSTRIES.forEach(function(ind){
+      html+='<option value="'+escapeHtml(ind)+'"'+(c.industry===ind?' selected':'')+'>'+escapeHtml(ind)+'</option>';
+    });
+    html+='</select></td>';
     html+='<td>';
     if(c.phone) html+='<div style="font-size:12px;color:var(--teal);opacity:0.8">'+c.phone+'</div>';
     if(c.website) html+='<div style="font-size:11px;color:var(--text-faint);margin-top:2px"><a href="'+c.website+'" target="_blank" style="color:var(--text-faint)">'+c.website.replace(/^https?:\/\/(www\.)?/,'').substring(0,25)+'</a></div>';
@@ -646,7 +759,7 @@ function renderCRM() {
 
 function exportCRM() {
   if (!crmList.length) { alert('Nothing to export.'); return; }
-  var rows=[['Starred','Business','Address','Phone','Email','Website','Rating','Reviews','Hours','Status','Call Count','Last Called','Notes','Added']];
+  var rows=[['Starred','Business','Industry','Address','Phone','Email','Website','Rating','Reviews','Hours','Status','Call Count','Last Called','Notes','Added']];
   crmList.forEach(function(c) {
     var st=[];
     if(c.status.called) st.push('Called');
@@ -663,7 +776,7 @@ function exportCRM() {
     }
     var ch = c.callHistory || [];
     var lastCalled = ch.length ? new Date(ch[ch.length-1]).toLocaleString() : '';
-    rows.push([c.starred?'YES':'','"'+c.title+'"','"'+(c.address||'')+'"',c.phone||'',c.email||'',c.website||'',c.rating||'',c.reviews||'','"'+hoursStr.replace(/"/g,'""')+'"',st.join(' | '),ch.length,'"'+lastCalled+'"','"'+(c.notes||'').replace(/"/g,'""').replace(/\n/g,' ')+'"',c.addedAt||'']);
+    rows.push([c.starred?'YES':'','"'+c.title+'"',c.industry||'','"'+(c.address||'')+'"',c.phone||'',c.email||'',c.website||'',c.rating||'',c.reviews||'','"'+hoursStr.replace(/"/g,'""')+'"',st.join(' | '),ch.length,'"'+lastCalled+'"','"'+(c.notes||'').replace(/"/g,'""').replace(/\n/g,' ')+'"',c.addedAt||'']);
   });
   var csv=rows.map(function(r){ return r.join(','); }).join('\n');
   var a=document.createElement('a');
