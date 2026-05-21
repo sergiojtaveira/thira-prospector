@@ -147,24 +147,14 @@
   .status-toggle.on.callback { background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.3); color: var(--blue); }
   .status-toggle.on.not-interested { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.25); color: var(--red); }
   .status-toggle.on.closed { background: rgba(126,207,173,0.2); border-color: rgba(126,207,173,0.5); color: var(--teal); }
-  .call-log-cell { min-width: 240px; max-width: 320px; }
-  .call-log-entries { margin-bottom: 6px; max-height: 160px; overflow-y: auto; }
-  .call-log-entry { padding: 5px 7px; border-left: 2px solid var(--border-teal); margin-bottom: 5px; background: rgba(126,207,173,0.04); border-radius: 0 4px 4px 0; }
-  .call-log-entry:last-child { margin-bottom: 0; }
-  .call-log-ts { font-size: 10px; color: var(--teal); font-weight: 500; margin-bottom: 2px; }
-  .call-log-text { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
-  .call-log-text.empty-ts { color: var(--text-faint); font-style: italic; }
-  .call-log-add { display: flex; gap: 4px; margin-top: 4px; }
-  .call-log-input { flex: 1; background: var(--bg); border: 0.5px solid var(--border); border-radius: 5px; padding: 0.3rem 0.5rem; font-size: 11px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; transition: border-color 0.15s; min-width: 0; }
-  .call-log-input::placeholder { color: var(--text-faint); font-style: italic; }
-  .call-log-input:focus { border-color: var(--border-teal); }
-  .call-log-submit { background: var(--teal); color: var(--bg); border: none; border-radius: 5px; padding: 0.3rem 0.6rem; font-size: 11px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; white-space: nowrap; transition: background 0.15s; flex-shrink: 0; }
-  .call-log-submit:hover { background: var(--teal-light); }
-  .notes-cell { min-width: 160px; max-width: 220px; }
+  .call-history { font-size: 10px; margin-top: 4px; line-height: 1.4; }
+  .call-history.recent { color: var(--amber); }
+  .call-history.old { color: var(--text-faint); }
+  .notes-cell { min-width: 200px; max-width: 280px; }
   .notes-preview { font-size: 12px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; padding: 0.5rem 0.7rem; border: 0.5px solid var(--border); border-radius: 6px; cursor: pointer; transition: all 0.15s; min-height: 32px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .notes-preview:hover { border-color: var(--border-teal); background: var(--bg-mid); color: var(--text); }
   .notes-preview.empty { color: var(--text-faint); font-style: italic; }
-  .notes-textarea { font-size: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; background: var(--bg); border: 0.5px solid var(--border-teal); border-radius: 6px; padding: 0.6rem 0.7rem; width: 100%; min-height: 80px; resize: vertical; outline: none; line-height: 1.5; transition: border-color 0.15s; }
+  .notes-textarea { font-size: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; background: var(--bg); border: 0.5px solid var(--border-teal); border-radius: 6px; padding: 0.6rem 0.7rem; width: 100%; min-height: 90px; resize: vertical; outline: none; line-height: 1.5; transition: border-color 0.15s; }
   .notes-textarea:focus { border-color: var(--teal); }
   .email-input { background: transparent; border: 0.5px solid var(--border); border-radius: 6px; padding: 0.4rem 0.6rem; font-size: 11px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; outline: none; transition: all 0.15s; width: 100%; min-width: 150px; }
   .email-input::placeholder { color: var(--text-faint); font-style: italic; }
@@ -278,9 +268,10 @@
       <div class="crm-stat"><div class="crm-stat-num" id="crmClosed">0</div><div class="crm-stat-label">Closed</div></div>
     </div>
 
+    <!-- Search + Industry filters -->
     <div id="crmControls" style="display:none">
       <div class="crm-search-bar">
-        <input class="crm-search-input" type="text" id="crmSearchInput" placeholder="&#128269; Search by name, address, phone, notes or log..." oninput="renderCRM()">
+        <input class="crm-search-input" type="text" id="crmSearchInput" placeholder="&#128269; Search by name, address, phone or notes..." oninput="renderCRM()">
       </div>
       <div class="industry-filter-bar" id="industryFilterBar">
         <span class="industry-label">Industry:</span>
@@ -350,7 +341,6 @@ function detectIndustry(title, typeStr) {
   return 'Other';
 }
 
-// Migrate existing records
 crmList.forEach(function(c){
   if(c.status && typeof c.status.callback === 'undefined') c.status.callback = false;
   if(typeof c.email === 'undefined') c.email = '';
@@ -360,10 +350,6 @@ crmList.forEach(function(c){
   if(typeof c.starred === 'undefined') c.starred = false;
   if(typeof c.callHistory === 'undefined') c.callHistory = [];
   if(typeof c.industry === 'undefined') c.industry = detectIndustry(c.title, c.type||'');
-  if(typeof c.callLog === 'undefined') {
-    // Migrate old callHistory timestamps into call log entries with no text
-    c.callLog = (c.callHistory||[]).map(function(ts){ return {ts: ts, text: ''}; });
-  }
 });
 
 function saveCRM() { localStorage.setItem('thira_crm', JSON.stringify(crmList)); updateCRMCount(); }
@@ -474,17 +460,6 @@ function formatTimeAgo(ts) {
   return Math.floor(days/7)+'w ago';
 }
 
-function formatLogTs(ts) {
-  var d = new Date(ts);
-  var now = new Date();
-  var isToday = d.toDateString() === now.toDateString();
-  var time = d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
-  if (isToday) return 'Today ' + time;
-  var yesterday = new Date(now); yesterday.setDate(now.getDate()-1);
-  if (d.toDateString() === yesterday.toDateString()) return 'Yesterday ' + time;
-  return d.toLocaleDateString('en-GB', {day:'numeric', month:'short'}) + ' ' + time;
-}
-
 function normalizeTitle(s) { return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
 function sortOrder(t) { return t==='no-website'?0:t==='bad-website'?1:2; }
 function mapsUrl(n, a) { return 'https://www.google.com/maps/search/'+encodeURIComponent(n+' '+a); }
@@ -520,38 +495,11 @@ function updateIndustry(id, val) {
   if (item) { item.industry = val; saveCRM(); rebuildIndustryPills(); renderCRM(); }
 }
 
-function addCallLogEntry(id, text) {
-  var item = crmList.find(function(c){ return c.id===id; });
-  if (!item) return;
-  if (!item.callLog) item.callLog = [];
-  item.callLog.push({ ts: Date.now(), text: text.trim() });
-  // Keep callHistory in sync for backwards compat
-  if (!item.callHistory) item.callHistory = [];
-  item.callHistory.push(Date.now());
-  item.status.called = true;
-  saveCRM();
-  renderCRM();
-}
-
-function submitCallLog(id) {
-  var input = document.getElementById('calllog_input_'+id);
-  if (!input) return;
-  var text = input.value.trim();
-  addCallLogEntry(id, text);
-}
-
-function handleCallLogKey(event, id) {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    submitCallLog(id);
-  }
-}
-
 function addToCRM(idx) {
   var r = allResults[idx];
   if (isInCRM(r.title, r.address)) return;
   var industry = detectIndustry(r.title, r.type||'');
-  crmList.push({ id:Date.now(), title:r.title, address:r.address, phone:r.phone, email:'', website:r.website, websiteType:r.websiteType, rating:r.rating, reviews:r.reviews, hours:r.hours, starred:false, callHistory:[], callLog:[], industry:industry, mapsUrl:mapsUrl(r.title,r.address), status:{called:false,callback:false,emailed:false,interested:false,notInterested:false,closed:false}, notes:'', addedAt:new Date().toLocaleDateString() });
+  crmList.push({ id:Date.now(), title:r.title, address:r.address, phone:r.phone, email:'', website:r.website, websiteType:r.websiteType, rating:r.rating, reviews:r.reviews, hours:r.hours, starred:false, callHistory:[], industry:industry, mapsUrl:mapsUrl(r.title,r.address), status:{called:false,callback:false,emailed:false,interested:false,notInterested:false,closed:false}, notes:'', addedAt:new Date().toLocaleDateString() });
   saveCRM();
   var btn = document.getElementById('addbtn_'+idx);
   if (btn) { btn.textContent='\u2713 Added'; btn.classList.add('added'); btn.disabled=true; }
@@ -565,8 +513,6 @@ function toggleStatus(id, key) {
   if (key==='called' && !item.status.called) {
     if (!item.callHistory) item.callHistory = [];
     item.callHistory.push(Date.now());
-    if (!item.callLog) item.callLog = [];
-    item.callLog.push({ ts: Date.now(), text: '' });
   }
   item.status[key] = !item.status[key];
   saveCRM(); renderCRM();
@@ -604,7 +550,7 @@ function expandNotes(id) {
   var item = crmList.find(function(c){ return c.id===id; });
   if (!item) return;
   var val = (item.notes||'').replace(/"/g,'&quot;');
-  wrap.innerHTML = '<textarea class="notes-textarea" id="notes_ta_'+id+'" placeholder="General notes..." oninput="updateNotes('+id+',this.value)" onblur="collapseNotes('+id+')">'+val+'</textarea>';
+  wrap.innerHTML = '<textarea class="notes-textarea" id="notes_ta_'+id+'" placeholder="Type your notes here..." oninput="updateNotes('+id+',this.value)" onblur="collapseNotes('+id+')">'+val+'</textarea>';
   var ta = document.getElementById('notes_ta_'+id);
   ta.focus();
   ta.setSelectionRange(ta.value.length, ta.value.length);
@@ -619,7 +565,7 @@ function collapseNotes(id) {
   if (preview) {
     wrap.innerHTML = '<div class="notes-preview" onclick="expandNotes('+id+')" title="Click to edit">'+escapeHtml(preview)+'</div>';
   } else {
-    wrap.innerHTML = '<div class="notes-preview empty" onclick="expandNotes('+id+')">Add note...</div>';
+    wrap.innerHTML = '<div class="notes-preview empty" onclick="expandNotes('+id+')">Add notes...</div>';
   }
 }
 
@@ -706,14 +652,12 @@ function getFilteredList() {
   if (industryFilter !== 'all') list = list.filter(function(c){ return c.industry === industryFilter; });
   if (searchVal) {
     list = list.filter(function(c){
-      var logText = (c.callLog||[]).map(function(e){ return e.text||''; }).join(' ');
       return (c.title||'').toLowerCase().indexOf(searchVal) > -1 ||
              (c.address||'').toLowerCase().indexOf(searchVal) > -1 ||
              (c.phone||'').toLowerCase().indexOf(searchVal) > -1 ||
              (c.notes||'').toLowerCase().indexOf(searchVal) > -1 ||
              (c.email||'').toLowerCase().indexOf(searchVal) > -1 ||
-             (c.industry||'').toLowerCase().indexOf(searchVal) > -1 ||
-             logText.toLowerCase().indexOf(searchVal) > -1;
+             (c.industry||'').toLowerCase().indexOf(searchVal) > -1;
     });
   }
   return list;
@@ -748,10 +692,10 @@ function renderCRM() {
     return;
   }
   var html='<div class="results-count">Showing '+list.length+' of '+crmList.length+' prospects</div>';
-  html+='<div class="crm-table-wrap"><table><thead><tr><th></th><th>Business</th><th>Industry</th><th>Contact</th><th>Email</th><th>Rating</th><th>Hours</th><th>Status</th><th>Call Log</th><th>Notes</th><th></th></tr></thead><tbody>';
+  html+='<div class="crm-table-wrap"><table><thead><tr><th></th><th>Business</th><th>Industry</th><th>Contact</th><th>Email</th><th>Rating</th><th>Hours</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody>';
   for (var i=0;i<list.length;i++) {
     var c=list[i]; var s=c.status;
-    var cl = c.callLog || [];
+    var ch = c.callHistory || [];
     html+='<tr class="'+(c.starred?'starred-row':'')+'">';
     html+='<td style="padding-right:0;width:36px"><button class="star-btn '+(c.starred?'starred':'')+'" onclick="toggleStar('+c.id+')" title="'+(c.starred?'Unstar':'Star this prospect')+'">'+(c.starred?'\u2605':'\u2606')+'</button></td>';
     html+='<td class="name-cell"><a href="'+c.mapsUrl+'" target="_blank">'+c.title+' &#8599;</a>';
@@ -791,31 +735,154 @@ function renderCRM() {
     html+='<button class="status-toggle '+(s.interested?'on interested':'')+'" onclick="toggleStatus('+c.id+',\'interested\')">Interested</button>';
     html+='<button class="status-toggle '+(s.notInterested?'on not-interested':'')+'" onclick="toggleStatus('+c.id+',\'notInterested\')">Not interested</button>';
     html+='<button class="status-toggle '+(s.closed?'on closed':'')+'" onclick="toggleStatus('+c.id+',\'closed\')">&#127881; Closed</button>';
-    html+='</div></td>';
-    // Call log column
-    html+='<td class="call-log-cell">';
-    if (cl.length > 0) {
-      html+='<div class="call-log-entries">';
-      for (var j=0; j<cl.length; j++) {
-        var entry = cl[j];
-        html+='<div class="call-log-entry">';
-        html+='<div class="call-log-ts">'+escapeHtml(formatLogTs(entry.ts))+'</div>';
-        if (entry.text) {
-          html+='<div class="call-log-text">'+escapeHtml(entry.text)+'</div>';
-        } else {
-          html+='<div class="call-log-text empty-ts">No note added</div>';
-        }
-        html+='</div>';
-      }
-      html+='</div>';
-    }
-    html+='<div class="call-log-add">';
-    html+='<input class="call-log-input" id="calllog_input_'+c.id+'" type="text" placeholder="Log a call..." onkeydown="handleCallLogKey(event,'+c.id+')">';
-    html+='<button class="call-log-submit" onclick="submitCallLog('+c.id+')">+ Log</button>';
     html+='</div>';
+    if (ch.length > 0) {
+      var lastCall = ch[ch.length-1];
+      var isRecent = (Date.now() - lastCall) < 86400000;
+      html+='<div class="call-history '+(isRecent?'recent':'old')+'">'+ch.length+' call'+(ch.length>1?'s':'')+' &middot; last '+formatTimeAgo(lastCall)+'</div>';
+    }
     html+='</td>';
-    // Notes column (now general notes only)
     var notesContent = (c.notes||'').trim();
     html+='<td class="notes-cell"><div id="notes_wrap_'+c.id+'">';
     if (notesContent) {
-      html+='<div class="notes-
+      html+='<div class="notes-preview" onclick="expandNotes('+c.id+')" title="Click to edit">'+escapeHtml(notesContent)+'</div>';
+    } else {
+      html+='<div class="notes-preview empty" onclick="expandNotes('+c.id+')">Add notes...</div>';
+    }
+    html+='</div></td>';
+    html+='<td><button class="delete-btn" onclick="deleteFromCRM('+c.id+')" title="Remove">&times;</button></td>';
+    html+='</tr>';
+  }
+  html+='</tbody></table></div>';
+  area.innerHTML=html;
+}
+
+function exportCRM() {
+  if (!crmList.length) { alert('Nothing to export.'); return; }
+  var rows=[['Starred','Business','Industry','Address','Phone','Email','Website','Rating','Reviews','Hours','Status','Call Count','Last Called','Notes','Added']];
+  crmList.forEach(function(c) {
+    var st=[];
+    if(c.status.called) st.push('Called');
+    if(c.status.callback) st.push('Call back');
+    if(c.status.emailed) st.push('Emailed');
+    if(c.status.interested) st.push('Interested');
+    if(c.status.notInterested) st.push('Not interested');
+    if(c.status.closed) st.push('Closed');
+    var h = normaliseHours(c.hours);
+    var hoursStr = '';
+    if (h) {
+      if (typeof h === 'string') hoursStr = h;
+      else hoursStr = Object.keys(h).map(function(k){ return k+': '+h[k]; }).join(' | ');
+    }
+    var ch = c.callHistory || [];
+    var lastCalled = ch.length ? new Date(ch[ch.length-1]).toLocaleString() : '';
+    rows.push([c.starred?'YES':'','"'+c.title+'"',c.industry||'','"'+(c.address||'')+'"',c.phone||'',c.email||'',c.website||'',c.rating||'',c.reviews||'','"'+hoursStr.replace(/"/g,'""')+'"',st.join(' | '),ch.length,'"'+lastCalled+'"','"'+(c.notes||'').replace(/"/g,'""').replace(/\n/g,' ')+'"',c.addedAt||'']);
+  });
+  var csv=rows.map(function(r){ return r.join(','); }).join('\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='thira-crm-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+function updateStats() {
+  var nw=allResults.filter(function(r){ return r.websiteType==='no-website'; }).length;
+  var bw=allResults.filter(function(r){ return r.websiteType==='bad-website'; }).length;
+  var hw=allResults.filter(function(r){ return r.websiteType==='has-website'; }).length;
+  document.getElementById('statTotal').textContent=allResults.length;
+  document.getElementById('statNoWebsite').textContent=nw;
+  document.getElementById('statBadWebsite').textContent=bw;
+  document.getElementById('statHasWebsite').textContent=hw;
+  document.getElementById('statsBar').style.display='grid';
+}
+
+function renderResults(filter) {
+  document.querySelectorAll('.filter-tab').forEach(function(t){ t.classList.toggle('active',t.dataset.filter===filter); });
+  var filtered=allResults;
+  if(filter==='prospects') filtered=allResults.filter(function(r){ return r.websiteType!=='has-website'; });
+  if(filter==='no-website') filtered=allResults.filter(function(r){ return r.websiteType==='no-website'; });
+  if(filter==='bad-website') filtered=allResults.filter(function(r){ return r.websiteType==='bad-website'; });
+  var grid=document.querySelector('.results-grid');
+  if(!grid) return;
+  if(!filtered.length) { grid.innerHTML='<div class="state-box"><div class="state-title">No results in this category.</div></div>'; return; }
+  var html='';
+  for(var i=0;i<filtered.length;i++) {
+    var r=filtered[i]; var origIdx=allResults.indexOf(r);
+    var alreadyAdded=isInCRM(r.title,r.address);
+    var websiteHtml=r.website?'<a href="'+r.website+'" target="_blank">'+r.website.replace(/^https?:\/\/(www\.)?/,'').substring(0,28)+'</a>':'<span style="font-style:italic">No website</span>';
+    var gmaps=mapsUrl(r.title,r.address);
+    html+='<div class="result-card '+r.websiteType+'" style="animation-delay:'+(i*0.04)+'s">';
+    html+='<div><div class="result-name"><a href="'+gmaps+'" target="_blank">'+r.title+' &#128205;</a></div>';
+    html+='<div class="result-meta">';
+    if(r.rating) html+=starsHtml(r.rating);
+    if(r.reviews) html+='<span class="result-meta-item">'+r.reviews+' reviews</span>';
+    if(r.type) html+='<span class="result-meta-item" style="color:rgba(126,207,173,0.5)">'+r.type+'</span>';
+    html+='</div>';
+    if(r.address) html+='<div class="result-address">'+r.address+'</div>';
+    if(r.phone) html+='<div style="margin-top:0.3rem"><span class="result-phone">'+r.phone+'</span></div>';
+    html+='</div><div class="result-right">';
+    html+='<span class="badge '+r.websiteType+'">'+badgeLabel(r.websiteType)+'</span>';
+    html+='<div class="result-website">'+websiteHtml+'</div>';
+    if(alreadyAdded) html+='<button class="add-btn added" disabled>\u2713 Added</button>';
+    else html+='<button class="add-btn" id="addbtn_'+origIdx+'" onclick="addToCRM('+origIdx+')">+ Add to list</button>';
+    html+='</div></div>';
+  }
+  grid.innerHTML=html;
+}
+
+async function runSearch() {
+  var businessType=document.getElementById('businessType').value.trim();
+  var location=document.getElementById('location').value.trim();
+  var apiKey='configured';
+  var btn=document.getElementById('searchBtn');
+  var errorBox=document.getElementById('errorBox');
+  errorBox.style.display='none';
+  if(!businessType||!location) { errorBox.textContent='Please enter a business type and location.'; errorBox.style.display='block'; return; }
+  if(!apiKey) { errorBox.textContent='Please enter your SerpApi key.'; errorBox.style.display='block'; return; }
+  btn.disabled=true; btn.textContent='Searching...';
+  document.getElementById('statsBar').style.display='none';
+  allResults=[];
+  document.getElementById('resultsArea').innerHTML='<div class="state-box"><div class="spinner"></div><div class="state-title">Searching Google Maps...</div><div class="state-desc">Finding '+businessType+'s in '+location+'...</div></div>';
+  try {
+    var q=encodeURIComponent(businessType+' in '+location+', UK');
+    var url='/search?q='+q;
+    var res=await fetch(url);
+    var data=await res.json();
+    if(data.error) throw new Error(data.error);
+    var results=data.local_results||[];
+    if(!results.length) { document.getElementById('resultsArea').innerHTML='<div class="state-box"><div class="state-icon">&#128235;</div><div class="state-title">No results found</div><div class="state-desc">Try a different term or broader location.</div></div>'; btn.disabled=false; btn.textContent='Search \u2192'; return; }
+    allResults=results.map(function(r){ return {title:r.title||'Unknown',address:r.address||'',phone:r.phone||'',website:r.website||null,rating:r.rating||null,reviews:r.reviews||null,type:r.type||'',hours:r.operating_hours||r.hours||r.opening_hours||null,websiteType:classifyWebsite(r.website)}; }).sort(function(a,b){ return sortOrder(a.websiteType)-sortOrder(b.websiteType); });
+    updateStats();
+    var nw=allResults.filter(function(r){ return r.websiteType==='no-website'; }).length;
+    var bw=allResults.filter(function(r){ return r.websiteType==='bad-website'; }).length;
+    document.getElementById('resultsArea').innerHTML=
+      '<div class="results-header"><div class="results-title">'+allResults.length+' businesses found &middot; "'+businessType+'" in '+location+'</div><div><button class="action-btn" onclick="exportProspects()">Export CSV</button></div></div>'+
+      '<div class="filter-tabs">'+
+      '<button class="filter-tab active" data-filter="prospects" onclick="renderResults(\'prospects\')">Prospects ('+(nw+bw)+')</button>'+
+      '<button class="filter-tab" data-filter="no-website" onclick="renderResults(\'no-website\')">No website ('+nw+')</button>'+
+      '<button class="filter-tab" data-filter="bad-website" onclick="renderResults(\'bad-website\')">Weak presence ('+bw+')</button>'+
+      '<button class="filter-tab" data-filter="all" onclick="renderResults(\'all\')">All ('+allResults.length+')</button>'+
+      '</div><div class="results-grid"></div>';
+    renderResults('prospects');
+  } catch(err) {
+    errorBox.textContent='Error: '+err.message;
+    errorBox.style.display='block';
+    document.getElementById('resultsArea').innerHTML='<div class="state-box"><div class="state-icon">&#9888;</div><div class="state-title">Something went wrong</div><div class="state-desc">'+err.message+'</div></div>';
+  }
+  btn.disabled=false; btn.textContent='Search \u2192';
+}
+
+function exportProspects() {
+  var prospects=allResults.filter(function(r){ return r.websiteType!=='has-website'; });
+  if(!prospects.length) { alert('No prospects to export.'); return; }
+  var rows=[['Business Name','Address','Phone','Status','Website','Rating','Reviews']];
+  prospects.forEach(function(r){ rows.push(['"'+r.title+'"','"'+(r.address||'')+'"',r.phone||'',badgeLabel(r.websiteType),r.website||'',r.rating||'',r.reviews||'']); });
+  var csv=rows.map(function(r){ return r.join(','); }).join('\n');
+  var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='thira-prospects-'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+}
+
+updateCRMCount();
+document.addEventListener('keydown', function(e){ if(e.key==='Enter'&&document.getElementById('searchPanel').classList.contains('active')) runSearch(); });
+</script>
+</body>
+</html>
