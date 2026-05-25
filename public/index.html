@@ -97,7 +97,7 @@
   .crm-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); letter-spacing: -0.3px; }
   .crm-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
   .crm-search-bar { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
-  .crm-search-input { background: var(--bg-mid); border: 0.5px solid var(--border); border-radius: 8px; padding: 0.6rem 1rem; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; transition: border-color 0.2s; flex: 1; max-width: 360px; }
+  .crm-search-input { background: var(--bg-mid); border: 0.5px solid var(--border); border-radius: 8px; padding: 0.6rem 1rem; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; transition: border-color 0.2s; flex: 1; max-width: 400px; }
   .crm-search-input::placeholder { color: var(--text-faint); }
   .crm-search-input:focus { border-color: var(--border-teal); }
   .industry-filter-bar { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.75rem; align-items: center; }
@@ -120,18 +120,20 @@
   .crm-filter.active.starred { background: rgba(252,211,77,0.12); border-color: rgba(252,211,77,0.4); color: var(--gold); }
   .crm-filter:hover:not(.active) { border-color: var(--border-teal); color: var(--text); }
   .crm-table-wrap { border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; min-width: 1400px; }
+  table { width: 100%; border-collapse: collapse; min-width: 900px; }
   thead tr { background: var(--bg-mid); border-bottom: 0.5px solid var(--border); }
   th { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-faint); padding: 0.85rem 1rem; text-align: left; white-space: nowrap; }
-  tbody tr { border-bottom: 0.5px solid var(--border); transition: background 0.15s; }
+  tbody tr { border-bottom: 0.5px solid var(--border); transition: background 0.15s; cursor: pointer; }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: var(--bg-mid); }
   tbody tr.starred-row { background: rgba(252,211,77,0.04); }
   tbody tr.starred-row:hover { background: rgba(252,211,77,0.08); }
-  td { padding: 0.85rem 1rem; font-size: 13px; color: var(--text-muted); vertical-align: top; }
+  td { padding: 0.75rem 1rem; font-size: 13px; color: var(--text-muted); vertical-align: middle; }
   td.name-cell { color: var(--text); font-weight: 500; }
-  td.name-cell a { color: var(--text); text-decoration: none; }
-  td.name-cell a:hover { color: var(--teal); }
+  .prospect-name-link { color: var(--text); text-decoration: none; font-weight: 500; font-size: 13px; }
+  .prospect-name-link:hover { color: var(--teal); }
+  .maps-link { font-size: 11px; color: var(--text-faint); margin-left: 6px; text-decoration: none; }
+  .maps-link:hover { color: var(--teal); }
   .star-btn { background: none; border: none; cursor: pointer; padding: 0.3rem; font-size: 18px; line-height: 1; transition: transform 0.15s; color: var(--text-faint); }
   .star-btn:hover { transform: scale(1.15); color: var(--gold); }
   .star-btn.starred { color: var(--gold); }
@@ -144,43 +146,83 @@
   .status-toggle.on.callback { background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.3); color: var(--blue); }
   .status-toggle.on.not-interested { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.25); color: var(--red); }
   .status-toggle.on.closed { background: rgba(126,207,173,0.2); border-color: rgba(126,207,173,0.5); color: var(--teal); }
-  .call-log-cell { min-width: 240px; max-width: 320px; }
-  .call-log-entries { margin-bottom: 6px; max-height: 160px; overflow-y: auto; }
-  .call-log-entry { padding: 5px 7px; border-left: 2px solid var(--border-teal); margin-bottom: 5px; background: rgba(126,207,173,0.04); border-radius: 0 4px 4px 0; }
-  .call-log-entry:last-child { margin-bottom: 0; }
-  .call-log-ts { font-size: 10px; color: var(--teal); font-weight: 500; margin-bottom: 2px; }
-  .call-log-text { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
-  .call-log-text.empty-ts { color: var(--text-faint); font-style: italic; }
-  .call-log-add { display: flex; gap: 4px; margin-top: 4px; }
-  .call-log-input { flex: 1; background: var(--bg); border: 0.5px solid var(--border); border-radius: 5px; padding: 0.3rem 0.5rem; font-size: 11px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; transition: border-color 0.15s; min-width: 0; }
-  .call-log-input::placeholder { color: var(--text-faint); font-style: italic; }
-  .call-log-input:focus { border-color: var(--border-teal); }
-  .call-log-submit { background: var(--teal); color: var(--bg); border: none; border-radius: 5px; padding: 0.3rem 0.6rem; font-size: 11px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; white-space: nowrap; transition: background 0.15s; flex-shrink: 0; }
-  .call-log-submit:hover { background: var(--teal-light); }
-  .notes-cell { min-width: 160px; max-width: 220px; }
-  .notes-preview { font-size: 12px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; padding: 0.5rem 0.7rem; border: 0.5px solid var(--border); border-radius: 6px; cursor: pointer; transition: all 0.15s; min-height: 32px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .notes-preview:hover { border-color: var(--border-teal); background: var(--bg-mid); color: var(--text); }
-  .notes-preview.empty { color: var(--text-faint); font-style: italic; }
-  .notes-textarea { font-size: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; background: var(--bg); border: 0.5px solid var(--border-teal); border-radius: 6px; padding: 0.6rem 0.7rem; width: 100%; min-height: 80px; resize: vertical; outline: none; line-height: 1.5; transition: border-color 0.15s; }
-  .notes-textarea:focus { border-color: var(--teal); }
-  .email-input { background: transparent; border: 0.5px solid var(--border); border-radius: 6px; padding: 0.4rem 0.6rem; font-size: 11px; color: var(--text-muted); font-family: 'DM Sans', sans-serif; outline: none; transition: all 0.15s; width: 100%; min-width: 150px; }
-  .email-input::placeholder { color: var(--text-faint); font-style: italic; }
-  .email-input:hover { border-color: var(--border-teal); }
-  .email-input:focus { border-color: var(--teal); color: var(--text); background: var(--bg); }
-  .rating-cell { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
-  .rating-cell .stars { display: block; margin-bottom: 2px; }
-  .rating-cell .review-count { font-size: 11px; color: var(--text-faint); }
-  .hours-preview { font-size: 11px; color: var(--text-muted); padding: 0.35rem 0.55rem; border: 0.5px solid var(--border); border-radius: 6px; cursor: pointer; transition: all 0.15s; min-width: 110px; max-width: 180px; line-height: 1.3; }
-  .hours-preview:hover { border-color: var(--border-teal); background: var(--bg-mid); color: var(--text); }
-  .hours-preview.empty { color: var(--text-faint); font-style: italic; cursor: default; }
-  .hours-popup { position: absolute; background: var(--bg-mid); border: 0.5px solid var(--border-teal); border-radius: 8px; padding: 0.75rem 1rem; font-size: 11px; color: var(--text); z-index: 100; min-width: 200px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); line-height: 1.6; }
-  .hours-popup div { white-space: nowrap; }
-  .hours-popup .day { color: var(--teal); font-weight: 500; margin-right: 8px; display: inline-block; min-width: 36px; }
+  .followup-badge { font-size: 10px; font-weight: 600; padding: 0.2rem 0.55rem; border-radius: 100px; white-space: nowrap; }
+  .followup-badge.overdue { background: rgba(248,113,113,0.12); color: var(--red); border: 0.5px solid rgba(248,113,113,0.3); }
+  .followup-badge.today { background: rgba(251,191,36,0.12); color: var(--amber); border: 0.5px solid rgba(251,191,36,0.3); }
+  .followup-badge.upcoming { background: rgba(96,165,250,0.1); color: var(--blue); border: 0.5px solid rgba(96,165,250,0.25); }
   .delete-btn { font-size: 18px; color: var(--text-faint); background: none; border: none; cursor: pointer; padding: 0.2rem 0.4rem; transition: color 0.15s; line-height: 1; }
   .delete-btn:hover { color: var(--red); }
   .results-count { font-size: 12px; color: var(--text-faint); margin-bottom: 0.75rem; }
+  .last-log-preview { font-size: 11px; color: var(--text-faint); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+
+  /* PROSPECT DETAIL PAGE */
+  .prospect-detail { display: none; }
+  .prospect-detail.active { display: block; }
+  .detail-back { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 13px; color: var(--text-muted); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; padding: 0; margin-bottom: 1.5rem; transition: color 0.15s; }
+  .detail-back:hover { color: var(--teal); }
+  .detail-layout { display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem; align-items: start; }
+  .detail-sidebar { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 16px; padding: 1.5rem; }
+  .detail-name { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); letter-spacing: -0.3px; margin-bottom: 0.35rem; line-height: 1.2; }
+  .detail-industry-badge { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 100px; background: rgba(96,165,250,0.1); border: 0.5px solid rgba(96,165,250,0.25); color: var(--blue); margin-bottom: 1rem; }
+  .detail-section { margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 0.5px solid var(--border); }
+  .detail-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .detail-section-label { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-faint); margin-bottom: 0.6rem; }
+  .detail-field { display: flex; flex-direction: column; gap: 0.2rem; margin-bottom: 0.75rem; }
+  .detail-field:last-child { margin-bottom: 0; }
+  .detail-field-label { font-size: 10px; color: var(--text-faint); letter-spacing: 0.5px; text-transform: uppercase; }
+  .detail-field-value { font-size: 13px; color: var(--text-muted); }
+  .detail-field-value a { color: var(--teal); text-decoration: none; }
+  .detail-field-value a:hover { text-decoration: underline; }
+  .detail-field-value.phone { color: var(--teal); font-size: 15px; font-weight: 500; }
+  .detail-status-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .detail-notes-area { width: 100%; background: var(--bg); border: 0.5px solid var(--border); border-radius: 8px; padding: 0.65rem 0.75rem; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; resize: vertical; min-height: 80px; line-height: 1.5; transition: border-color 0.15s; }
+  .detail-notes-area:focus { border-color: var(--border-teal); }
+  .detail-email-input { width: 100%; background: var(--bg); border: 0.5px solid var(--border); border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; transition: border-color 0.15s; }
+  .detail-email-input:focus { border-color: var(--border-teal); }
+  .detail-followup-input { width: 100%; background: var(--bg); border: 0.5px solid var(--border); border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; transition: border-color 0.15s; }
+  .detail-followup-input:focus { border-color: var(--border-teal); }
+  .detail-main { display: flex; flex-direction: column; gap: 1.25rem; }
+  .detail-card { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 16px; padding: 1.5rem; }
+  .detail-card-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+  .detail-card-title span { font-size: 10px; color: var(--text-faint); font-weight: 400; }
+  .call-timeline { display: flex; flex-direction: column; gap: 0; }
+  .call-timeline-entry { display: flex; gap: 1rem; padding-bottom: 1.25rem; position: relative; }
+  .call-timeline-entry:last-child { padding-bottom: 0; }
+  .call-timeline-entry:not(:last-child)::before { content: ''; position: absolute; left: 15px; top: 32px; bottom: 0; width: 1px; background: var(--border); }
+  .call-timeline-dot { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-mid); border: 0.5px solid var(--border-teal); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; position: relative; z-index: 1; }
+  .call-timeline-body { flex: 1; padding-top: 4px; }
+  .call-timeline-ts { font-size: 11px; color: var(--teal); font-weight: 500; margin-bottom: 3px; }
+  .call-timeline-text { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+  .call-timeline-text.empty { color: var(--text-faint); font-style: italic; }
+  .call-log-compose { display: flex; gap: 0.5rem; margin-top: 1rem; }
+  .call-log-compose-input { flex: 1; background: var(--bg); border: 0.5px solid var(--border); border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; transition: border-color 0.15s; }
+  .call-log-compose-input::placeholder { color: var(--text-faint); }
+  .call-log-compose-input:focus { border-color: var(--border-teal); }
+  .call-log-compose-btn { background: var(--teal); color: var(--bg); border: none; border-radius: 8px; padding: 0.6rem 1.25rem; font-size: 13px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+  .call-log-compose-btn:hover { background: var(--teal-light); }
+  .rating-stars { color: var(--amber); font-size: 16px; }
+  .hours-table { width: 100%; font-size: 12px; }
+  .hours-table td { padding: 0.25rem 0; color: var(--text-muted); }
+  .hours-table td:first-child { color: var(--teal); font-weight: 500; width: 80px; }
+  .detail-industry-select { width: 100%; background: var(--bg); border: 0.5px solid var(--border); border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--text-muted); outline: none; cursor: pointer; transition: border-color 0.15s; }
+  .detail-industry-select:focus { border-color: var(--teal); color: var(--text); }
+  .empty-log { text-align: center; padding: 2rem; color: var(--text-faint); font-size: 13px; }
+
+  /* TABLE QUICK ACTIONS */
+  .quick-actions { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+  .qa-btn { font-size: 10px; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 100px; cursor: pointer; border: 0.5px solid var(--border); background: transparent; color: var(--text-faint); font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap; }
+  .qa-btn:hover { border-color: var(--border-teal); color: var(--text); }
+  .qa-btn.on { background: var(--teal-dim); border-color: rgba(126,207,173,0.4); color: var(--teal); }
+  .qa-btn.on.called { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: var(--amber); }
+  .qa-btn.on.callback { background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.3); color: var(--blue); }
+  .qa-btn.on.not-interested { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.25); color: var(--red); }
+  .qa-btn.on.closed { background: rgba(126,207,173,0.2); border-color: rgba(126,207,173,0.5); color: var(--teal); }
+
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+  .prospect-detail.active { animation: slideInRight 0.25s ease both; }
+  @media (max-width: 900px) { .detail-layout { grid-template-columns: 1fr; } }
   @media (max-width: 700px) { .form-row { grid-template-columns: 1fr; } .stats-bar { grid-template-columns: repeat(2,1fr); } .result-card { grid-template-columns: 1fr; } .result-right { align-items: flex-start; flex-direction: row; flex-wrap: wrap; } .crm-stats { grid-template-columns: repeat(3,1fr); } }
 </style>
 </head>
@@ -197,6 +239,8 @@
     <button class="main-tab active" onclick="switchTab('search')">&#128269; Search</button>
     <button class="main-tab" onclick="switchTab('crm')" id="crmTab">&#128101; My List <span class="tab-count" id="crmCount">0</span></button>
   </div>
+
+  <!-- SEARCH TAB -->
   <div class="tab-panel active" id="searchPanel">
     <div class="search-panel">
       <div class="panel-title">Find businesses without websites</div>
@@ -237,58 +281,75 @@
       </div>
     </div>
   </div>
+
+  <!-- CRM TAB -->
   <div class="tab-panel" id="crmPanel">
-    <div class="crm-header">
-      <div class="crm-title">My Prospect List</div>
-      <div class="crm-actions">
-        <button class="refresh-btn" id="refreshBtn" onclick="refreshAllProspects()">&#8635; Refresh Google data</button>
-        <button class="action-btn" onclick="exportCRM()">Export CSV</button>
-        <button class="action-btn" onclick="clearCRM()" style="color:var(--red);border-color:rgba(248,113,113,0.3)">Clear all</button>
+
+    <!-- LIST VIEW -->
+    <div id="crmListView">
+      <div class="crm-header">
+        <div class="crm-title">My Prospect List</div>
+        <div class="crm-actions">
+          <button class="refresh-btn" id="refreshBtn" onclick="refreshAllProspects()">&#8635; Refresh Google data</button>
+          <button class="action-btn" onclick="exportCRM()">Export CSV</button>
+          <button class="action-btn" onclick="clearCRM()" style="color:var(--red);border-color:rgba(248,113,113,0.3)">Clear all</button>
+        </div>
+      </div>
+      <div class="progress-box" id="progressBox" style="display:none">
+        <div class="progress-spinner"></div>
+        <span id="progressText">Refreshing...</span>
+      </div>
+      <div class="crm-stats">
+        <div class="crm-stat"><div class="crm-stat-num" id="crmTotal">0</div><div class="crm-stat-label">Total</div></div>
+        <div class="crm-stat"><div class="crm-stat-num gold" id="crmStarred">0</div><div class="crm-stat-label">&#9733; Starred</div></div>
+        <div class="crm-stat"><div class="crm-stat-num" id="crmCalled">0</div><div class="crm-stat-label">Called</div></div>
+        <div class="crm-stat"><div class="crm-stat-num blue" id="crmCallback">0</div><div class="crm-stat-label">Call Back</div></div>
+        <div class="crm-stat"><div class="crm-stat-num" id="crmEmailed">0</div><div class="crm-stat-label">Emailed</div></div>
+        <div class="crm-stat"><div class="crm-stat-num" id="crmInterested">0</div><div class="crm-stat-label">Interested</div></div>
+        <div class="crm-stat"><div class="crm-stat-num" id="crmClosed">0</div><div class="crm-stat-label">Closed</div></div>
+      </div>
+      <div id="crmControls" style="display:none">
+        <div class="crm-search-bar">
+          <input class="crm-search-input" type="text" id="crmSearchInput" placeholder="&#128269; Search by name, address, phone, notes or log..." oninput="renderCRM()">
+        </div>
+        <div class="industry-filter-bar" id="industryFilterBar">
+          <span class="industry-label">Industry:</span>
+          <button class="industry-pill active" data-industry="all" onclick="setIndustryFilter('all')">All</button>
+        </div>
+        <div class="crm-filter-bar" id="crmFilterBar">
+          <button class="crm-filter active" data-filter="all" onclick="setCRMFilter('all')">All</button>
+          <button class="crm-filter" data-filter="starred" onclick="setCRMFilter('starred')">&#9733; Starred only</button>
+          <button class="crm-filter" data-filter="callback" onclick="setCRMFilter('callback')">&#128222; Call back</button>
+          <button class="crm-filter" data-filter="interested" onclick="setCRMFilter('interested')">Interested</button>
+          <button class="crm-filter" data-filter="uncalled" onclick="setCRMFilter('uncalled')">Not yet called</button>
+          <button class="crm-filter" data-filter="followup" onclick="setCRMFilter('followup')">&#128197; Follow up today</button>
+        </div>
+      </div>
+      <div id="crmArea">
+        <div class="state-box">
+          <div class="state-icon">&#128101;</div>
+          <div class="state-title">Your list is empty</div>
+          <div class="state-desc">Search for prospects and click "Add to List" to start tracking them here.</div>
+        </div>
       </div>
     </div>
-    <div class="progress-box" id="progressBox" style="display:none">
-      <div class="progress-spinner"></div>
-      <span id="progressText">Refreshing...</span>
+
+    <!-- PROSPECT DETAIL VIEW -->
+    <div id="crmDetailView" class="prospect-detail">
+      <button class="detail-back" onclick="closeDetail()">&#8592; Back to list</button>
+      <div id="detailContent"></div>
     </div>
-    <div class="crm-stats">
-      <div class="crm-stat"><div class="crm-stat-num" id="crmTotal">0</div><div class="crm-stat-label">Total</div></div>
-      <div class="crm-stat"><div class="crm-stat-num gold" id="crmStarred">0</div><div class="crm-stat-label">&#9733; Starred</div></div>
-      <div class="crm-stat"><div class="crm-stat-num" id="crmCalled">0</div><div class="crm-stat-label">Called</div></div>
-      <div class="crm-stat"><div class="crm-stat-num blue" id="crmCallback">0</div><div class="crm-stat-label">Call Back</div></div>
-      <div class="crm-stat"><div class="crm-stat-num" id="crmEmailed">0</div><div class="crm-stat-label">Emailed</div></div>
-      <div class="crm-stat"><div class="crm-stat-num" id="crmInterested">0</div><div class="crm-stat-label">Interested</div></div>
-      <div class="crm-stat"><div class="crm-stat-num" id="crmClosed">0</div><div class="crm-stat-label">Closed</div></div>
-    </div>
-    <div id="crmControls" style="display:none">
-      <div class="crm-search-bar">
-        <input class="crm-search-input" type="text" id="crmSearchInput" placeholder="&#128269; Search by name, address, phone, notes or log..." oninput="renderCRM()">
-      </div>
-      <div class="industry-filter-bar" id="industryFilterBar">
-        <span class="industry-label">Industry:</span>
-        <button class="industry-pill active" data-industry="all" onclick="setIndustryFilter('all')">All</button>
-      </div>
-      <div class="crm-filter-bar" id="crmFilterBar">
-        <button class="crm-filter active" data-filter="all" onclick="setCRMFilter('all')">All</button>
-        <button class="crm-filter" data-filter="starred" onclick="setCRMFilter('starred')">&#9733; Starred only</button>
-        <button class="crm-filter" data-filter="callback" onclick="setCRMFilter('callback')">&#128222; Call back</button>
-        <button class="crm-filter" data-filter="interested" onclick="setCRMFilter('interested')">Interested</button>
-        <button class="crm-filter" data-filter="uncalled" onclick="setCRMFilter('uncalled')">Not yet called</button>
-      </div>
-    </div>
-    <div id="crmArea">
-      <div class="state-box">
-        <div class="state-icon">&#128101;</div>
-        <div class="state-title">Your list is empty</div>
-        <div class="state-desc">Search for prospects and click "Add to List" to start tracking them here.</div>
-      </div>
-    </div>
+
   </div>
 </div>
+
 <script>
 var allResults = [];
 var crmList = JSON.parse(localStorage.getItem('thira_crm') || '[]');
 var crmFilter = 'all';
 var industryFilter = 'all';
+var currentDetailId = null;
+
 var INDUSTRIES = ['Carpenter','Electrician','Plumber','Plasterer','Tiler','Roofer','Painter','Decorator','Landscaper','Builder','Florist','Cleaning','Joiner','Glazier','Locksmith','Gas Engineer','Kitchen Fitter','Bathroom Fitter','Handyman','Other'];
 var INDUSTRY_KEYWORDS = {
   'Carpenter':['carpenter','carpentry','joinery','joiner','cabinet','woodwork','bespoke fit','bespoke furniture'],
@@ -310,7 +371,9 @@ var INDUSTRY_KEYWORDS = {
   'Bathroom Fitter':['bathroom'],
   'Handyman':['handyman','odd job','maintenance']
 };
+
 function detectIndustry(title,typeStr){var combined=((title||'')+' '+(typeStr||'')).toLowerCase();for(var ind in INDUSTRY_KEYWORDS){var kws=INDUSTRY_KEYWORDS[ind];for(var k=0;k<kws.length;k++){if(combined.indexOf(kws[k])>-1)return ind;}}return 'Other';}
+
 crmList.forEach(function(c){
   if(c.status&&typeof c.status.callback==='undefined')c.status.callback=false;
   if(typeof c.email==='undefined')c.email='';
@@ -322,19 +385,25 @@ crmList.forEach(function(c){
   if(typeof c.industry==='undefined')c.industry=detectIndustry(c.title,c.type||'');
   if(typeof c.callLog==='undefined')c.callLog=(c.callHistory||[]).map(function(ts){return{ts:ts,text:''};});
   if(typeof c.notes==='undefined')c.notes='';
+  if(typeof c.followUpDate==='undefined')c.followUpDate='';
 });
+
 function saveCRM(){localStorage.setItem('thira_crm',JSON.stringify(crmList));updateCRMCount();}
 function updateCRMCount(){document.getElementById('crmCount').textContent=crmList.length;}
+
 function switchTab(tab){
   document.querySelectorAll('.main-tab').forEach(function(t,i){t.classList.toggle('active',(i===0&&tab==='search')||(i===1&&tab==='crm'));});
   document.getElementById('searchPanel').classList.toggle('active',tab==='search');
   document.getElementById('crmPanel').classList.toggle('active',tab==='crm');
-  if(tab==='crm')renderCRM();
+  if(tab==='crm'){closeDetail();renderCRM();}
 }
+
 function setSearch(t,l){document.getElementById('businessType').value=t;document.getElementById('location').value=l;}
 function classifyWebsite(w){if(!w)return 'no-website';var u=w.toLowerCase();if(u.indexOf('facebook.com')>-1||u.indexOf('fb.com')>-1||u.indexOf('instagram.com')>-1||u.indexOf('linktr.ee')>-1||u.indexOf('yell.com')>-1||u.indexOf('checkatrade')>-1||u.indexOf('trustatrader')>-1||u.indexOf('rated.people')>-1)return 'bad-website';return 'has-website';}
 function badgeLabel(t){return t==='no-website'?'No website':t==='bad-website'?'Weak presence':'Has website';}
 function starsHtml(r){if(!r)return '';var f=Math.round(r),s='';for(var i=0;i<f;i++)s+='\u2605';for(var i=f;i<5;i++)s+='\u2606';return '<span class="stars">'+s+' '+r+'</span>';}
+function starsHtmlLarge(r){if(!r)return '';var f=Math.round(r),s='';for(var i=0;i<f;i++)s+='\u2605';for(var i=f;i<5;i++)s+='\u2606';return '<span class="rating-stars">'+s+'</span> <span style="font-size:14px;color:var(--text-muted)">'+r+'</span>';}
+
 function normaliseHours(hours){
   if(!hours)return null;
   if(typeof hours==='string')return hours;
@@ -342,16 +411,48 @@ function normaliseHours(hours){
   if(Array.isArray(hours)){var res={};hours.forEach(function(item){if(!item||typeof item!=='object')return;var day=item.day||item.name||item.weekday||'';var time=item.hours||item.time||item.open_now||item.times||'';if(typeof time==='object')time=JSON.stringify(time);if(day)res[String(day).toLowerCase()]=String(time);});return Object.keys(res).length?res:null;}
   return null;
 }
+
 function formatHoursPreview(hours){var h=normaliseHours(hours);if(!h)return null;if(typeof h==='string')return h;var dm=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];var tk=dm[new Date().getDay()];var keys=Object.keys(h);for(var i=0;i<keys.length;i++){if(keys[i].toLowerCase().indexOf(tk)===0)return 'Today: '+h[keys[i]];}return keys[0]+': '+h[keys[0]];}
-function formatFullHours(hours){var h=normaliseHours(hours);if(!h)return 'No hours available';if(typeof h==='string')return escapeHtml(h);var order=['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];var keys=Object.keys(h);keys.sort(function(a,b){var ai=order.findIndex(function(d){return a.toLowerCase().indexOf(d)===0;});var bi=order.findIndex(function(d){return b.toLowerCase().indexOf(d)===0;});return(ai===-1?99:ai)-(bi===-1?99:bi);});return keys.map(function(k){var label=k.charAt(0).toUpperCase()+k.slice(1,3);return '<div><span class="day">'+escapeHtml(label)+'</span>'+escapeHtml(String(h[k]))+'</div>';}).join('');}
+
+function formatFullHoursTable(hours){
+  var h=normaliseHours(hours);if(!h)return '<span style="color:var(--text-faint);font-style:italic">No hours available</span>';
+  if(typeof h==='string')return escapeHtml(h);
+  var order=['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+  var keys=Object.keys(h);
+  keys.sort(function(a,b){var ai=order.findIndex(function(d){return a.toLowerCase().indexOf(d)===0;});var bi=order.findIndex(function(d){return b.toLowerCase().indexOf(d)===0;});return(ai===-1?99:ai)-(bi===-1?99:bi);});
+  return '<table class="hours-table">'+keys.map(function(k){var label=k.charAt(0).toUpperCase()+k.slice(1,3);return '<tr><td>'+escapeHtml(label)+'</td><td>'+escapeHtml(String(h[k]))+'</td></tr>';}).join('')+'</table>';
+}
+
 function formatTimeAgo(ts){if(!ts)return '';var diff=Date.now()-ts;var mins=Math.floor(diff/60000);var hrs=Math.floor(diff/3600000);var days=Math.floor(diff/86400000);if(mins<1)return 'just now';if(mins<60)return mins+'m ago';if(hrs<24)return hrs+'h ago';if(days===1)return 'yesterday';if(days<7)return days+'d ago';return Math.floor(days/7)+'w ago';}
-function formatLogTs(ts){var d=new Date(ts);var now=new Date();var isToday=d.toDateString()===now.toDateString();var time=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});if(isToday)return 'Today '+time;var yesterday=new Date(now);yesterday.setDate(now.getDate()-1);if(d.toDateString()===yesterday.toDateString())return 'Yesterday '+time;return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' '+time;}
+function formatLogTs(ts){var d=new Date(ts);var now=new Date();var isToday=d.toDateString()===now.toDateString();var time=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});if(isToday)return 'Today '+time;var yesterday=new Date(now);yesterday.setDate(now.getDate()-1);if(d.toDateString()===yesterday.toDateString())return 'Yesterday '+time;return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' '+time;}
 function normalizeTitle(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
 function sortOrder(t){return t==='no-website'?0:t==='bad-website'?1:2;}
 function mapsUrl(n,a){return 'https://www.google.com/maps/search/'+encodeURIComponent(n+' '+a);}
 function isInCRM(title,address){return crmList.some(function(c){return c.title===title&&c.address===address;});}
 function escapeHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+function getFollowUpStatus(dateStr){
+  if(!dateStr)return null;
+  var today=new Date();today.setHours(0,0,0,0);
+  var fu=new Date(dateStr);fu.setHours(0,0,0,0);
+  var diff=fu-today;
+  if(diff<0)return 'overdue';
+  if(diff===0)return 'today';
+  return 'upcoming';
+}
+
+function formatFollowUpDisplay(dateStr){
+  if(!dateStr)return '';
+  var status=getFollowUpStatus(dateStr);
+  var d=new Date(dateStr);
+  var label=d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  if(status==='overdue')return '<span class="followup-badge overdue">&#9888; Overdue &middot; '+label+'</span>';
+  if(status==='today')return '<span class="followup-badge today">&#128197; Today &middot; '+label+'</span>';
+  return '<span class="followup-badge upcoming">&#128197; '+label+'</span>';
+}
+
 function getUsedIndustries(){var used={};crmList.forEach(function(c){if(c.industry)used[c.industry]=true;});return Object.keys(used).sort();}
+
 function rebuildIndustryPills(){
   var bar=document.getElementById('industryFilterBar');if(!bar)return;
   var used=getUsedIndustries();
@@ -360,8 +461,9 @@ function rebuildIndustryPills(){
   used.forEach(function(ind){var count=crmList.filter(function(c){return c.industry===ind;}).length;html+='<button class="industry-pill'+(industryFilter===ind?' active':'')+'" data-industry="'+escapeHtml(ind)+'" onclick="setIndustryFilter(\''+escapeHtml(ind)+'\')">'+escapeHtml(ind)+' ('+count+')</button>';});
   bar.innerHTML=html;
 }
+
 function setIndustryFilter(ind){industryFilter=ind;rebuildIndustryPills();renderCRM();}
-function updateIndustry(id,val){var item=crmList.find(function(c){return c.id===id;});if(item){item.industry=val;saveCRM();rebuildIndustryPills();renderCRM();}}
+
 function addCallLogEntry(id,text){
   var item=crmList.find(function(c){return c.id===id;});if(!item)return;
   if(!item.callLog)item.callLog=[];
@@ -369,18 +471,28 @@ function addCallLogEntry(id,text){
   if(!item.callHistory)item.callHistory=[];
   item.callHistory.push(Date.now());
   item.status.called=true;
-  saveCRM();renderCRM();
+  saveCRM();
 }
-function submitCallLog(id){var input=document.getElementById('calllog_input_'+id);if(!input)return;var text=input.value.trim();addCallLogEntry(id,text);}
-function handleCallLogKey(event,id){if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitCallLog(id);}}
+
+function submitCallLogDetail(id){
+  var input=document.getElementById('detail_log_input_'+id);if(!input)return;
+  var text=input.value.trim();
+  addCallLogEntry(id,text);
+  renderDetail(id);
+  renderCRM();
+}
+
+function handleDetailLogKey(event,id){if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitCallLogDetail(id);}}
+
 function addToCRM(idx){
   var r=allResults[idx];if(isInCRM(r.title,r.address))return;
   var industry=detectIndustry(r.title,r.type||'');
-  crmList.push({id:Date.now(),title:r.title,address:r.address,phone:r.phone,email:'',website:r.website,websiteType:r.websiteType,rating:r.rating,reviews:r.reviews,hours:r.hours,starred:false,callHistory:[],callLog:[],industry:industry,mapsUrl:mapsUrl(r.title,r.address),status:{called:false,callback:false,emailed:false,interested:false,notInterested:false,closed:false},notes:'',addedAt:new Date().toLocaleDateString()});
+  crmList.push({id:Date.now(),title:r.title,address:r.address,phone:r.phone,email:'',website:r.website,websiteType:r.websiteType,rating:r.rating,reviews:r.reviews,hours:r.hours,starred:false,callHistory:[],callLog:[],industry:industry,followUpDate:'',mapsUrl:mapsUrl(r.title,r.address),status:{called:false,callback:false,emailed:false,interested:false,notInterested:false,closed:false},notes:'',addedAt:new Date().toLocaleDateString()});
   saveCRM();
   var btn=document.getElementById('addbtn_'+idx);
   if(btn){btn.textContent='\u2713 Added';btn.classList.add('added');btn.disabled=true;}
 }
+
 function toggleStatus(id,key){
   var item=crmList.find(function(c){return c.id===id;});if(!item)return;
   if(key==='interested'&&!item.status.interested)item.status.notInterested=false;
@@ -393,66 +505,173 @@ function toggleStatus(id,key){
   }
   item.status[key]=!item.status[key];
   saveCRM();renderCRM();
+  if(currentDetailId===id)renderDetail(id);
 }
-function toggleStar(id){var item=crmList.find(function(c){return c.id===id;});if(!item)return;item.starred=!item.starred;saveCRM();renderCRM();}
+
+function toggleStar(id){
+  var item=crmList.find(function(c){return c.id===id;});if(!item)return;
+  item.starred=!item.starred;
+  saveCRM();renderCRM();
+  if(currentDetailId===id)renderDetail(id);
+}
+
 function setCRMFilter(filter){
   crmFilter=filter;
   document.querySelectorAll('.crm-filter').forEach(function(b){b.classList.toggle('active',b.dataset.filter===filter);b.classList.toggle('starred',filter==='starred'&&b.dataset.filter==='starred');});
   renderCRM();
 }
-function updateNotes(id,val){var item=crmList.find(function(c){return c.id===id;});if(item){item.notes=val;saveCRM();}}
-function updateEmail(id,val){var item=crmList.find(function(c){return c.id===id;});if(item){item.email=val.trim();saveCRM();}}
-function expandNotes(id){
-  var wrap=document.getElementById('notes_wrap_'+id);if(!wrap)return;
-  var item=crmList.find(function(c){return c.id===id;});if(!item)return;
-  var val=(item.notes||'').replace(/"/g,'&quot;');
-  wrap.innerHTML='<textarea class="notes-textarea" id="notes_ta_'+id+'" placeholder="General notes..." oninput="updateNotes('+id+',this.value)" onblur="collapseNotes('+id+')">'+val+'</textarea>';
-  var ta=document.getElementById('notes_ta_'+id);ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);
+
+function updateNotesDetail(id,val){
+  var item=crmList.find(function(c){return c.id===id;});
+  if(item){item.notes=val;saveCRM();}
 }
-function collapseNotes(id){
-  var wrap=document.getElementById('notes_wrap_'+id);if(!wrap)return;
-  var item=crmList.find(function(c){return c.id===id;});if(!item)return;
-  var preview=(item.notes||'').trim();
-  if(preview){wrap.innerHTML='<div class="notes-preview" onclick="expandNotes('+id+')" title="Click to edit">'+escapeHtml(preview)+'</div>';}
-  else{wrap.innerHTML='<div class="notes-preview empty" onclick="expandNotes('+id+')">Add note...</div>';}
+
+function updateEmailDetail(id,val){
+  var item=crmList.find(function(c){return c.id===id;});
+  if(item){item.email=val.trim();saveCRM();}
 }
-var hoursPopupEl=null;
-function showHoursPopup(id,ev){
-  ev.stopPropagation();hideHoursPopup();
-  var item=crmList.find(function(c){return c.id===id;});if(!item)return;
-  var popup=document.createElement('div');popup.className='hours-popup';popup.innerHTML=formatFullHours(item.hours);
-  var rect=ev.currentTarget.getBoundingClientRect();
-  popup.style.left=(rect.left+window.scrollX)+'px';popup.style.top=(rect.bottom+window.scrollY+4)+'px';
-  document.body.appendChild(popup);hoursPopupEl=popup;
-  setTimeout(function(){document.addEventListener('click',hideHoursPopup,{once:true});},10);
+
+function updateFollowUpDate(id,val){
+  var item=crmList.find(function(c){return c.id===id;});
+  if(item){item.followUpDate=val;saveCRM();renderCRM();}
 }
-function hideHoursPopup(){if(hoursPopupEl){hoursPopupEl.remove();hoursPopupEl=null;}}
-async function refreshAllProspects(){
-  if(!crmList.length){alert('No prospects to refresh.');return;}
-  if(!confirm('This will use '+crmList.length+' SerpApi searches to refresh data for all prospects. Continue?'))return;
-  var btn=document.getElementById('refreshBtn');var box=document.getElementById('progressBox');var txt=document.getElementById('progressText');
-  btn.disabled=true;box.style.display='flex';
-  var matched=0,failed=0;
-  for(var i=0;i<crmList.length;i++){
-    var c=crmList[i];txt.textContent='Refreshing '+(i+1)+' of '+crmList.length+': '+c.title;
-    try{
-      var q=encodeURIComponent(c.title+' '+(c.address||''));
-      var res=await fetch('/search?q='+q);var data=await res.json();
-      var results=data.local_results||(data.place_results?[data.place_results]:[]);
-      if(results.length){
-        var normTarget=normalizeTitle(c.title);var match=results[0];
-        for(var j=0;j<results.length;j++){if(normalizeTitle(results[j].title).indexOf(normTarget)>-1||normTarget.indexOf(normalizeTitle(results[j].title))>-1){match=results[j];break;}}
-        if(match.rating)c.rating=match.rating;if(match.reviews)c.reviews=match.reviews;
-        var h=match.operating_hours||match.hours||null;if(h)c.hours=h;
-        if(match.phone&&!c.phone)c.phone=match.phone;matched++;
-      }else{failed++;}
-    }catch(e){failed++;}
+
+function updateIndustryDetail(id,val){
+  var item=crmList.find(function(c){return c.id===id;});
+  if(item){item.industry=val;saveCRM();rebuildIndustryPills();renderCRM();}
+}
+
+function openDetail(id){
+  currentDetailId=id;
+  document.getElementById('crmListView').style.display='none';
+  document.getElementById('crmDetailView').classList.add('active');
+  renderDetail(id);
+  window.scrollTo(0,0);
+}
+
+function closeDetail(){
+  currentDetailId=null;
+  document.getElementById('crmListView').style.display='block';
+  document.getElementById('crmDetailView').classList.remove('active');
+}
+
+function renderDetail(id){
+  var c=crmList.find(function(x){return x.id===id;});
+  if(!c){closeDetail();return;}
+  var s=c.status;
+  var cl=c.callLog||[];
+  var html='<div class="detail-layout">';
+
+  // SIDEBAR
+  html+='<div class="detail-sidebar">';
+  html+='<div class="detail-name">'+escapeHtml(c.title)+'</div>';
+  html+='<div class="detail-industry-badge">'+escapeHtml(c.industry||'Other')+'</div>';
+
+  html+='<div class="detail-section">';
+  html+='<div class="detail-section-label">Contact</div>';
+  if(c.phone)html+='<div class="detail-field"><div class="detail-field-label">Phone</div><div class="detail-field-value phone"><a href="tel:'+escapeHtml(c.phone)+'">'+escapeHtml(c.phone)+'</a></div></div>';
+  html+='<div class="detail-field"><div class="detail-field-label">Email</div><input class="detail-email-input" type="email" placeholder="Add email address..." value="'+escapeHtml(c.email||'')+'" onchange="updateEmailDetail('+id+',this.value)"></div>';
+  if(c.address)html+='<div class="detail-field"><div class="detail-field-label">Address</div><div class="detail-field-value">'+escapeHtml(c.address)+'</div></div>';
+  html+='<div class="detail-field"><div class="detail-field-label">Google Maps</div><div class="detail-field-value"><a href="'+c.mapsUrl+'" target="_blank">Open in Maps &#8599;</a></div></div>';
+  html+='</div>';
+
+  html+='<div class="detail-section">';
+  html+='<div class="detail-section-label">Website</div>';
+  html+='<div class="detail-field"><div class="detail-field-value"><span class="badge '+c.websiteType+'">'+badgeLabel(c.websiteType)+'</span></div></div>';
+  if(c.website)html+='<div class="detail-field"><div class="detail-field-value"><a href="'+escapeHtml(c.website)+'" target="_blank">'+escapeHtml(c.website.replace(/^https?:\/\/(www\.)?/,'').substring(0,30))+'</a></div></div>';
+  html+='</div>';
+
+  if(c.rating){
+    html+='<div class="detail-section">';
+    html+='<div class="detail-section-label">Rating</div>';
+    html+='<div class="detail-field"><div class="detail-field-value">'+starsHtmlLarge(c.rating)+'</div></div>';
+    if(c.reviews)html+='<div class="detail-field"><div class="detail-field-value" style="color:var(--text-faint)">'+c.reviews+' reviews on Google</div></div>';
+    html+='</div>';
   }
-  saveCRM();box.style.display='none';btn.disabled=false;renderCRM();
-  alert('Done. Refreshed '+matched+' prospects. '+failed+' could not be matched.');
+
+  html+='<div class="detail-section">';
+  html+='<div class="detail-section-label">Industry</div>';
+  html+='<select class="detail-industry-select" onchange="updateIndustryDetail('+id+',this.value)">';
+  INDUSTRIES.forEach(function(ind){html+='<option value="'+escapeHtml(ind)+'"'+(c.industry===ind?' selected':'')+'>'+escapeHtml(ind)+'</option>';});
+  html+='</select>';
+  html+='</div>';
+
+  html+='<div class="detail-section">';
+  html+='<div class="detail-section-label">Follow Up Date</div>';
+  html+='<input class="detail-followup-input" type="date" value="'+escapeHtml(c.followUpDate||'')+'" onchange="updateFollowUpDate('+id+',this.value)">';
+  if(c.followUpDate)html+='<div style="margin-top:6px">'+formatFollowUpDisplay(c.followUpDate)+'</div>';
+  html+='</div>';
+
+  html+='<div class="detail-section">';
+  html+='<div class="detail-section-label">Added</div>';
+  html+='<div class="detail-field-value" style="font-size:12px;color:var(--text-faint)">'+escapeHtml(c.addedAt||'')+'</div>';
+  html+='</div>';
+
+  html+='<div style="margin-top:0.5rem"><button onclick="deleteFromCRM('+id+')" style="font-size:11px;color:var(--red);background:none;border:0.5px solid rgba(248,113,113,0.25);border-radius:100px;padding:0.3rem 0.8rem;cursor:pointer;font-family:DM Sans,sans-serif;width:100%;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(248,113,113,0.08)\'" onmouseout="this.style.background=\'none\'">Remove prospect</button></div>';
+  html+='</div>';
+
+  // MAIN AREA
+  html+='<div class="detail-main">';
+
+  // Status card
+  html+='<div class="detail-card">';
+  html+='<div class="detail-card-title">Status <span>Click to toggle</span></div>';
+  html+='<div class="detail-status-grid">';
+  html+='<button class="status-toggle '+(s.called?'on called':'')+'" onclick="toggleStatus('+id+',\'called\')">&#128222; Called</button>';
+  html+='<button class="status-toggle '+(s.callback?'on callback':'')+'" onclick="toggleStatus('+id+',\'callback\')">&#128222; Call back</button>';
+  html+='<button class="status-toggle '+(s.emailed?'on emailed':'')+'" onclick="toggleStatus('+id+',\'emailed\')">&#9993; Emailed</button>';
+  html+='<button class="status-toggle '+(s.interested?'on interested':'')+'" onclick="toggleStatus('+id+',\'interested\')">&#9733; Interested</button>';
+  html+='<button class="status-toggle '+(s.notInterested?'on not-interested':'')+'" onclick="toggleStatus('+id+',\'notInterested\')">Not interested</button>';
+  html+='<button class="status-toggle '+(s.closed?'on closed':'')+'" onclick="toggleStatus('+id+',\'closed\')">&#127881; Closed</button>';
+  html+='<button class="star-btn '+(c.starred?'starred':'')+'" onclick="toggleStar('+id+')" style="font-size:22px">'+(c.starred?'\u2605':'\u2606')+'</button>';
+  html+='</div>';
+  html+='</div>';
+
+  // Call log card
+  html+='<div class="detail-card">';
+  html+='<div class="detail-card-title">Call Log <span>'+cl.length+' entr'+(cl.length===1?'y':'ies')+'</span></div>';
+  if(cl.length===0){
+    html+='<div class="empty-log">&#128222; No calls logged yet. Use the box below to log your first call.</div>';
+  } else {
+    html+='<div class="call-timeline">';
+    for(var i=cl.length-1;i>=0;i--){
+      var entry=cl[i];
+      html+='<div class="call-timeline-entry">';
+      html+='<div class="call-timeline-dot">&#128222;</div>';
+      html+='<div class="call-timeline-body">';
+      html+='<div class="call-timeline-ts">'+escapeHtml(formatLogTs(entry.ts))+'</div>';
+      if(entry.text)html+='<div class="call-timeline-text">'+escapeHtml(entry.text)+'</div>';
+      else html+='<div class="call-timeline-text empty">No note added</div>';
+      html+='</div></div>';
+    }
+    html+='</div>';
+  }
+  html+='<div class="call-log-compose">';
+  html+='<input class="call-log-compose-input" id="detail_log_input_'+id+'" type="text" placeholder="Log a call note and press Enter..." onkeydown="handleDetailLogKey(event,'+id+')">';
+  html+='<button class="call-log-compose-btn" onclick="submitCallLogDetail('+id+')">+ Log call</button>';
+  html+='</div>';
+  html+='</div>';
+
+  // Notes card
+  html+='<div class="detail-card">';
+  html+='<div class="detail-card-title">General Notes</div>';
+  html+='<textarea class="detail-notes-area" placeholder="General notes about this prospect..." oninput="updateNotesDetail('+id+',this.value)">'+escapeHtml(c.notes||'')+'</textarea>';
+  html+='</div>';
+
+  // Hours card
+  var h=normaliseHours(c.hours);
+  if(h){
+    html+='<div class="detail-card">';
+    html+='<div class="detail-card-title">Opening Hours</div>';
+    html+=formatFullHoursTable(c.hours);
+    html+='</div>';
+  }
+
+  html+='</div>';
+  html+='</div>';
+  document.getElementById('detailContent').innerHTML=html;
 }
-function deleteFromCRM(id){crmList=crmList.filter(function(c){return c.id!==id;});saveCRM();rebuildIndustryPills();renderCRM();}
-function clearCRM(){if(!crmList.length)return;if(confirm('Clear all '+crmList.length+' prospects?')){crmList=[];saveCRM();renderCRM();}}
+
 function getFilteredList(){
   var searchVal=(document.getElementById('crmSearchInput')?document.getElementById('crmSearchInput').value:'').toLowerCase().trim();
   var list=crmList;
@@ -460,6 +679,7 @@ function getFilteredList(){
   else if(crmFilter==='callback')list=list.filter(function(c){return c.status.callback;});
   else if(crmFilter==='interested')list=list.filter(function(c){return c.status.interested;});
   else if(crmFilter==='uncalled')list=list.filter(function(c){return!c.status.called&&!c.status.notInterested&&!c.status.closed;});
+  else if(crmFilter==='followup')list=list.filter(function(c){var st=getFollowUpStatus(c.followUpDate);return st==='today'||st==='overdue';});
   if(industryFilter!=='all')list=list.filter(function(c){return c.industry===industryFilter;});
   if(searchVal){
     list=list.filter(function(c){
@@ -469,6 +689,7 @@ function getFilteredList(){
   }
   return list;
 }
+
 function renderCRM(){
   var called=crmList.filter(function(c){return c.status.called;}).length;
   var callback=crmList.filter(function(c){return c.status.callback;}).length;
@@ -488,71 +709,61 @@ function renderCRM(){
   var area=document.getElementById('crmArea');
   if(!crmList.length){area.innerHTML='<div class="state-box"><div class="state-icon">&#128101;</div><div class="state-title">Your list is empty</div><div class="state-desc">Search for prospects and click "Add to List" to start tracking them here.</div></div>';return;}
   var list=getFilteredList();
-  list.sort(function(a,b){return(b.starred?1:0)-(a.starred?1:0);});
+  list.sort(function(a,b){
+    var aOver=getFollowUpStatus(a.followUpDate)==='overdue'||getFollowUpStatus(a.followUpDate)==='today';
+    var bOver=getFollowUpStatus(b.followUpDate)==='overdue'||getFollowUpStatus(b.followUpDate)==='today';
+    if(bOver&&!aOver)return 1;if(aOver&&!bOver)return -1;
+    return(b.starred?1:0)-(a.starred?1:0);
+  });
   if(!list.length){area.innerHTML='<div class="state-box"><div class="state-title">No prospects match your search or filter.</div><div class="state-desc">Try clearing the search or changing the filter.</div></div>';return;}
-  var html='<div class="results-count">Showing '+list.length+' of '+crmList.length+' prospects</div>';
-  html+='<div class="crm-table-wrap"><table><thead><tr><th></th><th>Business</th><th>Industry</th><th>Contact</th><th>Email</th><th>Rating</th><th>Hours</th><th>Status</th><th>Call Log</th><th>Notes</th><th></th></tr></thead><tbody>';
+  var results_count='<div class="results-count">Showing '+list.length+' of '+crmList.length+' prospects</div>';
+  var html='<div class="crm-table-wrap"><table><thead><tr><th></th><th>Business</th><th>Industry</th><th>Phone</th><th>Status</th><th>Last Call</th><th>Follow Up</th><th></th></tr></thead><tbody>';
   for(var i=0;i<list.length;i++){
     var c=list[i];var s=c.status;var cl=c.callLog||[];
-    html+='<tr class="'+(c.starred?'starred-row':'')+'">';
-    html+='<td style="padding-right:0;width:36px"><button class="star-btn '+(c.starred?'starred':'')+'" onclick="toggleStar('+c.id+')">'+(c.starred?'\u2605':'\u2606')+'</button></td>';
-    html+='<td class="name-cell"><a href="'+c.mapsUrl+'" target="_blank">'+c.title+' &#8599;</a>';
-    if(c.address)html+='<div style="font-size:11px;color:var(--text-faint);font-weight:400;margin-top:2px">'+c.address+'</div>';
-    html+='<div style="margin-top:4px"><span class="badge '+c.websiteType+'">'+badgeLabel(c.websiteType)+'</span></div></td>';
-    html+='<td><select class="industry-select" onchange="updateIndustry('+c.id+',this.value)">';
-    INDUSTRIES.forEach(function(ind){html+='<option value="'+escapeHtml(ind)+'"'+(c.industry===ind?' selected':'')+'>'+escapeHtml(ind)+'</option>';});
-    html+='</select></td>';
-    html+='<td>';
-    if(c.phone)html+='<div style="font-size:12px;color:var(--teal);opacity:0.8">'+c.phone+'</div>';
-    if(c.website)html+='<div style="font-size:11px;color:var(--text-faint);margin-top:2px"><a href="'+c.website+'" target="_blank" style="color:var(--text-faint)">'+c.website.replace(/^https?:\/\/(www\.)?/,'').substring(0,25)+'</a></div>';
-    if(!c.phone&&!c.website)html+='<span style="color:var(--text-faint);font-size:12px">—</span>';
+    var lastEntry=cl.length?cl[cl.length-1]:null;
+    html+='<tr class="'+(c.starred?'starred-row':'')+'" onclick="openDetail('+c.id+')">';
+    html+='<td style="padding-right:0;width:36px" onclick="event.stopPropagation()"><button class="star-btn '+(c.starred?'starred':'')+'" onclick="toggleStar('+c.id+')">'+(c.starred?'\u2605':'\u2606')+'</button></td>';
+    html+='<td class="name-cell">';
+    html+='<span class="prospect-name-link">'+escapeHtml(c.title)+'</span>';
+    html+='<a class="maps-link" href="'+c.mapsUrl+'" target="_blank" onclick="event.stopPropagation()" title="Open in Google Maps">&#128205;</a>';
+    if(c.address)html+='<div style="font-size:11px;color:var(--text-faint);font-weight:400;margin-top:2px">'+escapeHtml(c.address.substring(0,35))+'</div>';
+    html+='<div style="margin-top:4px"><span class="badge '+c.websiteType+'">'+badgeLabel(c.websiteType)+'</span></div>';
     html+='</td>';
-    html+='<td><input class="email-input" type="email" placeholder="Add email..." value="'+escapeHtml(c.email||'')+'" onchange="updateEmail('+c.id+',this.value)"></td>';
-    html+='<td class="rating-cell">';
-    if(c.rating){html+=starsHtml(c.rating);if(c.reviews)html+='<div class="review-count">'+c.reviews+' reviews</div>';}
-    else{html+='<span style="color:var(--text-faint);font-style:italic;font-size:11px">No rating</span>';}
-    html+='</td>';
-    var hoursPreview=formatHoursPreview(c.hours);
-    html+='<td>';
-    if(hoursPreview){html+='<div class="hours-preview" onclick="showHoursPopup('+c.id+',event)">'+escapeHtml(hoursPreview)+'</div>';}
-    else{html+='<div class="hours-preview empty">No hours</div>';}
-    html+='</td>';
-    html+='<td><div class="status-cell">';
-    html+='<button class="status-toggle '+(s.called?'on called':'')+'" onclick="toggleStatus('+c.id+',\'called\')">Called</button>';
-    html+='<button class="status-toggle '+(s.callback?'on callback':'')+'" onclick="toggleStatus('+c.id+',\'callback\')">&#128222; Call back</button>';
-    html+='<button class="status-toggle '+(s.emailed?'on emailed':'')+'" onclick="toggleStatus('+c.id+',\'emailed\')">Emailed</button>';
-    html+='<button class="status-toggle '+(s.interested?'on interested':'')+'" onclick="toggleStatus('+c.id+',\'interested\')">Interested</button>';
-    html+='<button class="status-toggle '+(s.notInterested?'on not-interested':'')+'" onclick="toggleStatus('+c.id+',\'notInterested\')">Not interested</button>';
-    html+='<button class="status-toggle '+(s.closed?'on closed':'')+'" onclick="toggleStatus('+c.id+',\'closed\')">&#127881; Closed</button>';
+    html+='<td style="font-size:11px;color:var(--text-muted)">'+escapeHtml(c.industry||'Other')+'</td>';
+    html+='<td style="font-size:12px;color:var(--teal)">'+(c.phone?escapeHtml(c.phone):'<span style="color:var(--text-faint)">—</span>')+'</td>';
+    html+='<td onclick="event.stopPropagation()"><div class="quick-actions">';
+    html+='<button class="qa-btn '+(s.called?'on called':'')+'" onclick="toggleStatus('+c.id+',\'called\')">Called</button>';
+    html+='<button class="qa-btn '+(s.callback?'on callback':'')+'" onclick="toggleStatus('+c.id+',\'callback\')">&#128222; CB</button>';
+    html+='<button class="qa-btn '+(s.interested?'on interested':'')+'" onclick="toggleStatus('+c.id+',\'interested\')">&#9733;</button>';
+    html+='<button class="qa-btn '+(s.closed?'on closed':'')+'" onclick="toggleStatus('+c.id+',\'closed\')">&#127881;</button>';
     html+='</div></td>';
-    html+='<td class="call-log-cell">';
-    if(cl.length>0){
-      html+='<div class="call-log-entries">';
-      for(var j=0;j<cl.length;j++){
-        var entry=cl[j];
-        html+='<div class="call-log-entry"><div class="call-log-ts">'+escapeHtml(formatLogTs(entry.ts))+'</div>';
-        if(entry.text)html+='<div class="call-log-text">'+escapeHtml(entry.text)+'</div>';
-        else html+='<div class="call-log-text empty-ts">No note added</div>';
-        html+='</div>';
-      }
-      html+='</div>';
-    }
-    html+='<div class="call-log-add"><input class="call-log-input" id="calllog_input_'+c.id+'" type="text" placeholder="Log a call..." onkeydown="handleCallLogKey(event,'+c.id+')"><button class="call-log-submit" onclick="submitCallLog('+c.id+')">+ Log</button></div>';
+    html+='<td>';
+    if(lastEntry){
+      html+='<div style="font-size:11px;color:var(--teal)">'+escapeHtml(formatTimeAgo(lastEntry.ts))+'</div>';
+      if(lastEntry.text)html+='<div class="last-log-preview">'+escapeHtml(lastEntry.text)+'</div>';
+    }else{html+='<span style="color:var(--text-faint);font-size:11px">Not yet called</span>';}
     html+='</td>';
-    var notesContent=(c.notes||'').trim();
-    html+='<td class="notes-cell"><div id="notes_wrap_'+c.id+'">';
-    if(notesContent)html+='<div class="notes-preview" onclick="expandNotes('+c.id+')">'+escapeHtml(notesContent)+'</div>';
-    else html+='<div class="notes-preview empty" onclick="expandNotes('+c.id+')">Add note...</div>';
-    html+='</div></td>';
-    html+='<td><button class="delete-btn" onclick="deleteFromCRM('+c.id+')" title="Remove">&times;</button></td>';
+    html+='<td onclick="event.stopPropagation()">'+formatFollowUpDisplay(c.followUpDate)+'</td>';
+    html+='<td onclick="event.stopPropagation()"><button class="delete-btn" onclick="deleteFromCRM('+c.id+')" title="Remove">&times;</button></td>';
     html+='</tr>';
   }
   html+='</tbody></table></div>';
-  area.innerHTML=html;
+  area.innerHTML=results_count+html;
 }
+
+function deleteFromCRM(id){
+  if(!confirm('Remove this prospect?'))return;
+  crmList=crmList.filter(function(c){return c.id!==id;});
+  saveCRM();rebuildIndustryPills();
+  if(currentDetailId===id)closeDetail();
+  renderCRM();
+}
+
+function clearCRM(){if(!crmList.length)return;if(confirm('Clear all '+crmList.length+' prospects?')){crmList=[];saveCRM();closeDetail();renderCRM();}}
+
 function exportCRM(){
   if(!crmList.length){alert('Nothing to export.');return;}
-  var rows=[['Starred','Business','Industry','Address','Phone','Email','Website','Rating','Reviews','Hours','Status','Call Count','Last Called','Call Log','Notes','Added']];
+  var rows=[['Starred','Business','Industry','Address','Phone','Email','Website','Rating','Reviews','Hours','Status','Call Count','Last Called','Call Log','Follow Up Date','Notes','Added']];
   crmList.forEach(function(c){
     var st=[];
     if(c.status.called)st.push('Called');if(c.status.callback)st.push('Call back');if(c.status.emailed)st.push('Emailed');if(c.status.interested)st.push('Interested');if(c.status.notInterested)st.push('Not interested');if(c.status.closed)st.push('Closed');
@@ -561,17 +772,19 @@ function exportCRM(){
     var cl=c.callLog||[];
     var lastCalled=cl.length?new Date(cl[cl.length-1].ts).toLocaleString():'';
     var logStr=cl.map(function(e){return formatLogTs(e.ts)+(e.text?' - '+e.text:'');}).join(' | ');
-    rows.push([c.starred?'YES':'','"'+c.title+'"',c.industry||'','"'+(c.address||'')+'"',c.phone||'',c.email||'',c.website||'',c.rating||'',c.reviews||'','"'+hoursStr.replace(/"/g,'""')+'"',st.join(' | '),cl.length,'"'+lastCalled+'"','"'+logStr.replace(/"/g,'""')+'"','"'+(c.notes||'').replace(/"/g,'""').replace(/\n/g,' ')+'"',c.addedAt||'']);
+    rows.push([c.starred?'YES':'','"'+c.title+'"',c.industry||'','"'+(c.address||'')+'"',c.phone||'',c.email||'',c.website||'',c.rating||'',c.reviews||'','"'+hoursStr.replace(/"/g,'""')+'"',st.join(' | '),cl.length,'"'+lastCalled+'"','"'+logStr.replace(/"/g,'""')+'"',c.followUpDate||'','"'+(c.notes||'').replace(/"/g,'""').replace(/\n/g,' ')+'"',c.addedAt||'']);
   });
   var csv=rows.map(function(r){return r.join(',');}).join('\n');
   var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='thira-crm-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
+
 function updateStats(){
   var nw=allResults.filter(function(r){return r.websiteType==='no-website';}).length;
   var bw=allResults.filter(function(r){return r.websiteType==='bad-website';}).length;
   var hw=allResults.filter(function(r){return r.websiteType==='has-website';}).length;
   document.getElementById('statTotal').textContent=allResults.length;document.getElementById('statNoWebsite').textContent=nw;document.getElementById('statBadWebsite').textContent=bw;document.getElementById('statHasWebsite').textContent=hw;document.getElementById('statsBar').style.display='grid';
 }
+
 function renderResults(filter){
   document.querySelectorAll('.filter-tab').forEach(function(t){t.classList.toggle('active',t.dataset.filter===filter);});
   var filtered=allResults;
@@ -601,6 +814,7 @@ function renderResults(filter){
   }
   grid.innerHTML=html;
 }
+
 async function runSearch(){
   var businessType=document.getElementById('businessType').value.trim();
   var location=document.getElementById('location').value.trim();
@@ -635,6 +849,7 @@ async function runSearch(){
   }
   btn.disabled=false;btn.textContent='Search \u2192';
 }
+
 function exportProspects(){
   var prospects=allResults.filter(function(r){return r.websiteType!=='has-website';});
   if(!prospects.length){alert('No prospects to export.');return;}
@@ -643,6 +858,25 @@ function exportProspects(){
   var csv=rows.map(function(r){return r.join(',');}).join('\n');
   var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='thira-prospects-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
+
+function refreshAllProspects(){
+  if(!crmList.length){alert('No prospects to refresh.');return;}
+  if(!confirm('This will use '+crmList.length+' SerpApi searches to refresh data for all prospects. Continue?'))return;
+  var btn=document.getElementById('refreshBtn');var box=document.getElementById('progressBox');var txt=document.getElementById('progressText');
+  btn.disabled=true;box.style.display='flex';
+  var i=0;
+  function next(){
+    if(i>=crmList.length){saveCRM();box.style.display='none';btn.disabled=false;renderCRM();alert('Done.');return;}
+    var c=crmList[i];txt.textContent='Refreshing '+(i+1)+' of '+crmList.length+': '+c.title;
+    fetch('/search?q='+encodeURIComponent(c.title+' '+(c.address||''))).then(function(r){return r.json();}).then(function(data){
+      var results=data.local_results||(data.place_results?[data.place_results]:[]);
+      if(results.length){var match=results[0];if(match.rating)c.rating=match.rating;if(match.reviews)c.reviews=match.reviews;var h=match.operating_hours||match.hours||null;if(h)c.hours=h;if(match.phone&&!c.phone)c.phone=match.phone;}
+      i++;next();
+    }).catch(function(){i++;next();});
+  }
+  next();
+}
+
 updateCRMCount();
 document.addEventListener('keydown',function(e){if(e.key==='Enter'&&document.getElementById('searchPanel').classList.contains('active'))runSearch();});
 </script>
