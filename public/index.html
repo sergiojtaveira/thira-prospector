@@ -154,12 +154,17 @@
   .delete-btn:hover { color: var(--red); }
   .results-count { font-size: 12px; color: var(--text-faint); margin-bottom: 0.75rem; }
   .last-log-preview { font-size: 11px; color: var(--text-faint); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
-
-  /* PROSPECT DETAIL PAGE */
   .prospect-detail { display: none; }
   .prospect-detail.active { display: block; }
-  .detail-back { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 13px; color: var(--text-muted); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; padding: 0; margin-bottom: 1.5rem; transition: color 0.15s; }
+  .detail-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+  .detail-nav-left { display: flex; align-items: center; gap: 1rem; }
+  .detail-back { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 13px; color: var(--text-muted); cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; padding: 0; transition: color 0.15s; }
   .detail-back:hover { color: var(--teal); }
+  .detail-nav-right { display: flex; align-items: center; gap: 0.5rem; }
+  .detail-nav-counter { font-size: 12px; color: var(--text-faint); padding: 0 0.5rem; }
+  .detail-nav-btn { width: 36px; height: 36px; border-radius: 8px; border: 0.5px solid var(--border); background: var(--bg-card); color: var(--text-muted); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+  .detail-nav-btn:hover:not(:disabled) { border-color: var(--border-teal); color: var(--teal); background: var(--bg-mid); }
+  .detail-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
   .detail-layout { display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem; align-items: start; }
   .detail-sidebar { background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 16px; padding: 1.5rem; }
   .detail-name { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); letter-spacing: -0.3px; margin-bottom: 0.35rem; line-height: 1.2; }
@@ -207,8 +212,6 @@
   .detail-industry-select { width: 100%; background: var(--bg); border: 0.5px solid var(--border); border-radius: 8px; padding: 0.55rem 0.75rem; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--text-muted); outline: none; cursor: pointer; transition: border-color 0.15s; }
   .detail-industry-select:focus { border-color: var(--teal); color: var(--text); }
   .empty-log { text-align: center; padding: 2rem; color: var(--text-faint); font-size: 13px; }
-
-  /* TABLE QUICK ACTIONS */
   .quick-actions { display: flex; gap: 0.3rem; flex-wrap: wrap; }
   .qa-btn { font-size: 10px; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 100px; cursor: pointer; border: 0.5px solid var(--border); background: transparent; color: var(--text-faint); font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap; }
   .qa-btn:hover { border-color: var(--border-teal); color: var(--text); }
@@ -217,7 +220,6 @@
   .qa-btn.on.callback { background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.3); color: var(--blue); }
   .qa-btn.on.not-interested { background: rgba(248,113,113,0.1); border-color: rgba(248,113,113,0.25); color: var(--red); }
   .qa-btn.on.closed { background: rgba(126,207,173,0.2); border-color: rgba(126,207,173,0.5); color: var(--teal); }
-
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
@@ -239,8 +241,6 @@
     <button class="main-tab active" onclick="switchTab('search')">&#128269; Search</button>
     <button class="main-tab" onclick="switchTab('crm')" id="crmTab">&#128101; My List <span class="tab-count" id="crmCount">0</span></button>
   </div>
-
-  <!-- SEARCH TAB -->
   <div class="tab-panel active" id="searchPanel">
     <div class="search-panel">
       <div class="panel-title">Find businesses without websites</div>
@@ -281,11 +281,7 @@
       </div>
     </div>
   </div>
-
-  <!-- CRM TAB -->
   <div class="tab-panel" id="crmPanel">
-
-    <!-- LIST VIEW -->
     <div id="crmListView">
       <div class="crm-header">
         <div class="crm-title">My Prospect List</div>
@@ -333,44 +329,31 @@
         </div>
       </div>
     </div>
-
-    <!-- PROSPECT DETAIL VIEW -->
     <div id="crmDetailView" class="prospect-detail">
-      <button class="detail-back" onclick="closeDetail()">&#8592; Back to list</button>
+      <div class="detail-nav">
+        <div class="detail-nav-left">
+          <button class="detail-back" onclick="closeDetail()">&#8592; Back to list</button>
+        </div>
+        <div class="detail-nav-right">
+          <span class="detail-nav-counter" id="detailNavCounter"></span>
+          <button class="detail-nav-btn" id="detailPrevBtn" onclick="navigateDetail(-1)" title="Previous prospect">&#8592;</button>
+          <button class="detail-nav-btn" id="detailNextBtn" onclick="navigateDetail(1)" title="Next prospect">&#8594;</button>
+        </div>
+      </div>
       <div id="detailContent"></div>
     </div>
-
   </div>
 </div>
-
 <script>
-var allResults = [];
-var crmList = JSON.parse(localStorage.getItem('thira_crm') || '[]');
-var crmFilter = 'all';
-var industryFilter = 'all';
-var currentDetailId = null;
+var allResults=[];
+var crmList=JSON.parse(localStorage.getItem('thira_crm')||'[]');
+var crmFilter='all';
+var industryFilter='all';
+var currentDetailId=null;
+var currentFilteredList=[];
 
-var INDUSTRIES = ['Carpenter','Electrician','Plumber','Plasterer','Tiler','Roofer','Painter','Decorator','Landscaper','Builder','Florist','Cleaning','Joiner','Glazier','Locksmith','Gas Engineer','Kitchen Fitter','Bathroom Fitter','Handyman','Other'];
-var INDUSTRY_KEYWORDS = {
-  'Carpenter':['carpenter','carpentry','joinery','joiner','cabinet','woodwork','bespoke fit','bespoke furniture'],
-  'Electrician':['electric','electrical','sparks','sparky','wiring','fuse'],
-  'Plumber':['plumb','boiler','heating','drainage','pipe'],
-  'Plasterer':['plaster','rendering','render'],
-  'Tiler':['til','tiling'],
-  'Roofer':['roof','roofing','gutter'],
-  'Painter':['paint','decorat','decorator'],
-  'Landscaper':['landscape','garden','landscaping','paving','driveway','turf','lawn'],
-  'Builder':['build','construction','brickwork','extension','groundwork'],
-  'Florist':['florist','flower','floral'],
-  'Cleaning':['clean','domestic','office clean','window clean'],
-  'Joiner':['joiner','joinery'],
-  'Glazier':['glaz','glass','window','double glaz'],
-  'Locksmith':['locksmith','lock'],
-  'Gas Engineer':['gas','boiler','heating engineer','gas safe'],
-  'Kitchen Fitter':['kitchen'],
-  'Bathroom Fitter':['bathroom'],
-  'Handyman':['handyman','odd job','maintenance']
-};
+var INDUSTRIES=['Carpenter','Electrician','Plumber','Plasterer','Tiler','Roofer','Painter','Decorator','Landscaper','Builder','Florist','Cleaning','Joiner','Glazier','Locksmith','Gas Engineer','Kitchen Fitter','Bathroom Fitter','Handyman','Other'];
+var INDUSTRY_KEYWORDS={'Carpenter':['carpenter','carpentry','joinery','joiner','cabinet','woodwork','bespoke fit','bespoke furniture'],'Electrician':['electric','electrical','sparks','sparky','wiring','fuse'],'Plumber':['plumb','boiler','heating','drainage','pipe'],'Plasterer':['plaster','rendering','render'],'Tiler':['til','tiling'],'Roofer':['roof','roofing','gutter'],'Painter':['paint','decorat','decorator'],'Landscaper':['landscape','garden','landscaping','paving','driveway','turf','lawn'],'Builder':['build','construction','brickwork','extension','groundwork'],'Florist':['florist','flower','floral'],'Cleaning':['clean','domestic','office clean','window clean'],'Joiner':['joiner','joinery'],'Glazier':['glaz','glass','window','double glaz'],'Locksmith':['locksmith','lock'],'Gas Engineer':['gas','boiler','heating engineer','gas safe'],'Kitchen Fitter':['kitchen'],'Bathroom Fitter':['bathroom'],'Handyman':['handyman','odd job','maintenance']};
 
 function detectIndustry(title,typeStr){var combined=((title||'')+' '+(typeStr||'')).toLowerCase();for(var ind in INDUSTRY_KEYWORDS){var kws=INDUSTRY_KEYWORDS[ind];for(var k=0;k<kws.length;k++){if(combined.indexOf(kws[k])>-1)return ind;}}return 'Other';}
 
@@ -411,8 +394,6 @@ function normaliseHours(hours){
   if(Array.isArray(hours)){var res={};hours.forEach(function(item){if(!item||typeof item!=='object')return;var day=item.day||item.name||item.weekday||'';var time=item.hours||item.time||item.open_now||item.times||'';if(typeof time==='object')time=JSON.stringify(time);if(day)res[String(day).toLowerCase()]=String(time);});return Object.keys(res).length?res:null;}
   return null;
 }
-
-function formatHoursPreview(hours){var h=normaliseHours(hours);if(!h)return null;if(typeof h==='string')return h;var dm=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];var tk=dm[new Date().getDay()];var keys=Object.keys(h);for(var i=0;i<keys.length;i++){if(keys[i].toLowerCase().indexOf(tk)===0)return 'Today: '+h[keys[i]];}return keys[0]+': '+h[keys[0]];}
 
 function formatFullHoursTable(hours){
   var h=normaliseHours(hours);if(!h)return '<span style="color:var(--text-faint);font-style:italic">No hours available</span>';
@@ -521,24 +502,29 @@ function setCRMFilter(filter){
   renderCRM();
 }
 
-function updateNotesDetail(id,val){
-  var item=crmList.find(function(c){return c.id===id;});
-  if(item){item.notes=val;saveCRM();}
+function updateNotesDetail(id,val){var item=crmList.find(function(c){return c.id===id;});if(item){item.notes=val;saveCRM();}}
+function updateEmailDetail(id,val){var item=crmList.find(function(c){return c.id===id;});if(item){item.email=val.trim();saveCRM();}}
+function updateFollowUpDate(id,val){var item=crmList.find(function(c){return c.id===id;});if(item){item.followUpDate=val;saveCRM();renderCRM();updateNavButtons();}}
+function updateIndustryDetail(id,val){var item=crmList.find(function(c){return c.id===id;});if(item){item.industry=val;saveCRM();rebuildIndustryPills();renderCRM();}}
+
+function updateNavButtons(){
+  var idx=currentFilteredList.findIndex(function(c){return c.id===currentDetailId;});
+  var total=currentFilteredList.length;
+  var counter=document.getElementById('detailNavCounter');
+  var prevBtn=document.getElementById('detailPrevBtn');
+  var nextBtn=document.getElementById('detailNextBtn');
+  if(counter)counter.textContent=(idx+1)+' of '+total;
+  if(prevBtn)prevBtn.disabled=idx<=0;
+  if(nextBtn)nextBtn.disabled=idx>=total-1;
 }
 
-function updateEmailDetail(id,val){
-  var item=crmList.find(function(c){return c.id===id;});
-  if(item){item.email=val.trim();saveCRM();}
-}
-
-function updateFollowUpDate(id,val){
-  var item=crmList.find(function(c){return c.id===id;});
-  if(item){item.followUpDate=val;saveCRM();renderCRM();}
-}
-
-function updateIndustryDetail(id,val){
-  var item=crmList.find(function(c){return c.id===id;});
-  if(item){item.industry=val;saveCRM();rebuildIndustryPills();renderCRM();}
+function navigateDetail(dir){
+  var idx=currentFilteredList.findIndex(function(c){return c.id===currentDetailId;});
+  var newIdx=idx+dir;
+  if(newIdx<0||newIdx>=currentFilteredList.length)return;
+  currentDetailId=currentFilteredList[newIdx].id;
+  renderDetail(currentDetailId);
+  window.scrollTo(0,0);
 }
 
 function openDetail(id){
@@ -546,6 +532,7 @@ function openDetail(id){
   document.getElementById('crmListView').style.display='none';
   document.getElementById('crmDetailView').classList.add('active');
   renderDetail(id);
+  updateNavButtons();
   window.scrollTo(0,0);
 }
 
@@ -558,64 +545,43 @@ function closeDetail(){
 function renderDetail(id){
   var c=crmList.find(function(x){return x.id===id;});
   if(!c){closeDetail();return;}
-  var s=c.status;
-  var cl=c.callLog||[];
+  currentDetailId=id;
+  updateNavButtons();
+  var s=c.status;var cl=c.callLog||[];
   var html='<div class="detail-layout">';
-
-  // SIDEBAR
   html+='<div class="detail-sidebar">';
   html+='<div class="detail-name">'+escapeHtml(c.title)+'</div>';
   html+='<div class="detail-industry-badge">'+escapeHtml(c.industry||'Other')+'</div>';
-
-  html+='<div class="detail-section">';
-  html+='<div class="detail-section-label">Contact</div>';
+  html+='<div class="detail-section"><div class="detail-section-label">Contact</div>';
   if(c.phone)html+='<div class="detail-field"><div class="detail-field-label">Phone</div><div class="detail-field-value phone"><a href="tel:'+escapeHtml(c.phone)+'">'+escapeHtml(c.phone)+'</a></div></div>';
   html+='<div class="detail-field"><div class="detail-field-label">Email</div><input class="detail-email-input" type="email" placeholder="Add email address..." value="'+escapeHtml(c.email||'')+'" onchange="updateEmailDetail('+id+',this.value)"></div>';
   if(c.address)html+='<div class="detail-field"><div class="detail-field-label">Address</div><div class="detail-field-value">'+escapeHtml(c.address)+'</div></div>';
   html+='<div class="detail-field"><div class="detail-field-label">Google Maps</div><div class="detail-field-value"><a href="'+c.mapsUrl+'" target="_blank">Open in Maps &#8599;</a></div></div>';
   html+='</div>';
-
-  html+='<div class="detail-section">';
-  html+='<div class="detail-section-label">Website</div>';
+  html+='<div class="detail-section"><div class="detail-section-label">Website</div>';
   html+='<div class="detail-field"><div class="detail-field-value"><span class="badge '+c.websiteType+'">'+badgeLabel(c.websiteType)+'</span></div></div>';
   if(c.website)html+='<div class="detail-field"><div class="detail-field-value"><a href="'+escapeHtml(c.website)+'" target="_blank">'+escapeHtml(c.website.replace(/^https?:\/\/(www\.)?/,'').substring(0,30))+'</a></div></div>';
   html+='</div>';
-
   if(c.rating){
-    html+='<div class="detail-section">';
-    html+='<div class="detail-section-label">Rating</div>';
+    html+='<div class="detail-section"><div class="detail-section-label">Rating</div>';
     html+='<div class="detail-field"><div class="detail-field-value">'+starsHtmlLarge(c.rating)+'</div></div>';
     if(c.reviews)html+='<div class="detail-field"><div class="detail-field-value" style="color:var(--text-faint)">'+c.reviews+' reviews on Google</div></div>';
     html+='</div>';
   }
-
-  html+='<div class="detail-section">';
-  html+='<div class="detail-section-label">Industry</div>';
+  html+='<div class="detail-section"><div class="detail-section-label">Industry</div>';
   html+='<select class="detail-industry-select" onchange="updateIndustryDetail('+id+',this.value)">';
   INDUSTRIES.forEach(function(ind){html+='<option value="'+escapeHtml(ind)+'"'+(c.industry===ind?' selected':'')+'>'+escapeHtml(ind)+'</option>';});
-  html+='</select>';
-  html+='</div>';
-
-  html+='<div class="detail-section">';
-  html+='<div class="detail-section-label">Follow Up Date</div>';
+  html+='</select></div>';
+  html+='<div class="detail-section"><div class="detail-section-label">Follow Up Date</div>';
   html+='<input class="detail-followup-input" type="date" value="'+escapeHtml(c.followUpDate||'')+'" onchange="updateFollowUpDate('+id+',this.value)">';
   if(c.followUpDate)html+='<div style="margin-top:6px">'+formatFollowUpDisplay(c.followUpDate)+'</div>';
   html+='</div>';
-
-  html+='<div class="detail-section">';
-  html+='<div class="detail-section-label">Added</div>';
-  html+='<div class="detail-field-value" style="font-size:12px;color:var(--text-faint)">'+escapeHtml(c.addedAt||'')+'</div>';
-  html+='</div>';
-
+  html+='<div class="detail-section"><div class="detail-section-label">Added</div>';
+  html+='<div class="detail-field-value" style="font-size:12px;color:var(--text-faint)">'+escapeHtml(c.addedAt||'')+'</div></div>';
   html+='<div style="margin-top:0.5rem"><button onclick="deleteFromCRM('+id+')" style="font-size:11px;color:var(--red);background:none;border:0.5px solid rgba(248,113,113,0.25);border-radius:100px;padding:0.3rem 0.8rem;cursor:pointer;font-family:DM Sans,sans-serif;width:100%;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(248,113,113,0.08)\'" onmouseout="this.style.background=\'none\'">Remove prospect</button></div>';
   html+='</div>';
-
-  // MAIN AREA
   html+='<div class="detail-main">';
-
-  // Status card
-  html+='<div class="detail-card">';
-  html+='<div class="detail-card-title">Status <span>Click to toggle</span></div>';
+  html+='<div class="detail-card"><div class="detail-card-title">Status <span>Click to toggle</span></div>';
   html+='<div class="detail-status-grid">';
   html+='<button class="status-toggle '+(s.called?'on called':'')+'" onclick="toggleStatus('+id+',\'called\')">&#128222; Called</button>';
   html+='<button class="status-toggle '+(s.callback?'on callback':'')+'" onclick="toggleStatus('+id+',\'callback\')">&#128222; Call back</button>';
@@ -624,21 +590,14 @@ function renderDetail(id){
   html+='<button class="status-toggle '+(s.notInterested?'on not-interested':'')+'" onclick="toggleStatus('+id+',\'notInterested\')">Not interested</button>';
   html+='<button class="status-toggle '+(s.closed?'on closed':'')+'" onclick="toggleStatus('+id+',\'closed\')">&#127881; Closed</button>';
   html+='<button class="star-btn '+(c.starred?'starred':'')+'" onclick="toggleStar('+id+')" style="font-size:22px">'+(c.starred?'\u2605':'\u2606')+'</button>';
-  html+='</div>';
-  html+='</div>';
-
-  // Call log card
-  html+='<div class="detail-card">';
-  html+='<div class="detail-card-title">Call Log <span>'+cl.length+' entr'+(cl.length===1?'y':'ies')+'</span></div>';
-  if(cl.length===0){
-    html+='<div class="empty-log">&#128222; No calls logged yet. Use the box below to log your first call.</div>';
-  } else {
+  html+='</div></div>';
+  html+='<div class="detail-card"><div class="detail-card-title">Call Log <span>'+cl.length+' entr'+(cl.length===1?'y':'ies')+'</span></div>';
+  if(cl.length===0){html+='<div class="empty-log">&#128222; No calls logged yet. Use the box below to log your first call.</div>';}
+  else{
     html+='<div class="call-timeline">';
     for(var i=cl.length-1;i>=0;i--){
       var entry=cl[i];
-      html+='<div class="call-timeline-entry">';
-      html+='<div class="call-timeline-dot">&#128222;</div>';
-      html+='<div class="call-timeline-body">';
+      html+='<div class="call-timeline-entry"><div class="call-timeline-dot">&#128222;</div><div class="call-timeline-body">';
       html+='<div class="call-timeline-ts">'+escapeHtml(formatLogTs(entry.ts))+'</div>';
       if(entry.text)html+='<div class="call-timeline-text">'+escapeHtml(entry.text)+'</div>';
       else html+='<div class="call-timeline-text empty">No note added</div>';
@@ -646,29 +605,14 @@ function renderDetail(id){
     }
     html+='</div>';
   }
-  html+='<div class="call-log-compose">';
-  html+='<input class="call-log-compose-input" id="detail_log_input_'+id+'" type="text" placeholder="Log a call note and press Enter..." onkeydown="handleDetailLogKey(event,'+id+')">';
-  html+='<button class="call-log-compose-btn" onclick="submitCallLogDetail('+id+')">+ Log call</button>';
+  html+='<div class="call-log-compose"><input class="call-log-compose-input" id="detail_log_input_'+id+'" type="text" placeholder="Log a call note and press Enter..." onkeydown="handleDetailLogKey(event,'+id+')"><button class="call-log-compose-btn" onclick="submitCallLogDetail('+id+')">+ Log call</button></div>';
   html+='</div>';
-  html+='</div>';
-
-  // Notes card
-  html+='<div class="detail-card">';
-  html+='<div class="detail-card-title">General Notes</div>';
+  html+='<div class="detail-card"><div class="detail-card-title">General Notes</div>';
   html+='<textarea class="detail-notes-area" placeholder="General notes about this prospect..." oninput="updateNotesDetail('+id+',this.value)">'+escapeHtml(c.notes||'')+'</textarea>';
   html+='</div>';
-
-  // Hours card
   var h=normaliseHours(c.hours);
-  if(h){
-    html+='<div class="detail-card">';
-    html+='<div class="detail-card-title">Opening Hours</div>';
-    html+=formatFullHoursTable(c.hours);
-    html+='</div>';
-  }
-
-  html+='</div>';
-  html+='</div>';
+  if(h){html+='<div class="detail-card"><div class="detail-card-title">Opening Hours</div>'+formatFullHoursTable(c.hours)+'</div>';}
+  html+='</div></div>';
   document.getElementById('detailContent').innerHTML=html;
 }
 
@@ -715,6 +659,7 @@ function renderCRM(){
     if(bOver&&!aOver)return 1;if(aOver&&!bOver)return -1;
     return(b.starred?1:0)-(a.starred?1:0);
   });
+  currentFilteredList=list;
   if(!list.length){area.innerHTML='<div class="state-box"><div class="state-title">No prospects match your search or filter.</div><div class="state-desc">Try clearing the search or changing the filter.</div></div>';return;}
   var results_count='<div class="results-count">Showing '+list.length+' of '+crmList.length+' prospects</div>';
   var html='<div class="crm-table-wrap"><table><thead><tr><th></th><th>Business</th><th>Industry</th><th>Phone</th><th>Status</th><th>Last Call</th><th>Follow Up</th><th></th></tr></thead><tbody>';
@@ -723,12 +668,10 @@ function renderCRM(){
     var lastEntry=cl.length?cl[cl.length-1]:null;
     html+='<tr class="'+(c.starred?'starred-row':'')+'" onclick="openDetail('+c.id+')">';
     html+='<td style="padding-right:0;width:36px" onclick="event.stopPropagation()"><button class="star-btn '+(c.starred?'starred':'')+'" onclick="toggleStar('+c.id+')">'+(c.starred?'\u2605':'\u2606')+'</button></td>';
-    html+='<td class="name-cell">';
-    html+='<span class="prospect-name-link">'+escapeHtml(c.title)+'</span>';
+    html+='<td class="name-cell"><span class="prospect-name-link">'+escapeHtml(c.title)+'</span>';
     html+='<a class="maps-link" href="'+c.mapsUrl+'" target="_blank" onclick="event.stopPropagation()" title="Open in Google Maps">&#128205;</a>';
     if(c.address)html+='<div style="font-size:11px;color:var(--text-faint);font-weight:400;margin-top:2px">'+escapeHtml(c.address.substring(0,35))+'</div>';
-    html+='<div style="margin-top:4px"><span class="badge '+c.websiteType+'">'+badgeLabel(c.websiteType)+'</span></div>';
-    html+='</td>';
+    html+='<div style="margin-top:4px"><span class="badge '+c.websiteType+'">'+badgeLabel(c.websiteType)+'</span></div></td>';
     html+='<td style="font-size:11px;color:var(--text-muted)">'+escapeHtml(c.industry||'Other')+'</td>';
     html+='<td style="font-size:12px;color:var(--teal)">'+(c.phone?escapeHtml(c.phone):'<span style="color:var(--text-faint)">—</span>')+'</td>';
     html+='<td onclick="event.stopPropagation()"><div class="quick-actions">';
@@ -738,10 +681,8 @@ function renderCRM(){
     html+='<button class="qa-btn '+(s.closed?'on closed':'')+'" onclick="toggleStatus('+c.id+',\'closed\')">&#127881;</button>';
     html+='</div></td>';
     html+='<td>';
-    if(lastEntry){
-      html+='<div style="font-size:11px;color:var(--teal)">'+escapeHtml(formatTimeAgo(lastEntry.ts))+'</div>';
-      if(lastEntry.text)html+='<div class="last-log-preview">'+escapeHtml(lastEntry.text)+'</div>';
-    }else{html+='<span style="color:var(--text-faint);font-size:11px">Not yet called</span>';}
+    if(lastEntry){html+='<div style="font-size:11px;color:var(--teal)">'+escapeHtml(formatTimeAgo(lastEntry.ts))+'</div>';if(lastEntry.text)html+='<div class="last-log-preview">'+escapeHtml(lastEntry.text)+'</div>';}
+    else{html+='<span style="color:var(--text-faint);font-size:11px">Not yet called</span>';}
     html+='</td>';
     html+='<td onclick="event.stopPropagation()">'+formatFollowUpDisplay(c.followUpDate)+'</td>';
     html+='<td onclick="event.stopPropagation()"><button class="delete-btn" onclick="deleteFromCRM('+c.id+')" title="Remove">&times;</button></td>';
@@ -878,7 +819,11 @@ function refreshAllProspects(){
 }
 
 updateCRMCount();
-document.addEventListener('keydown',function(e){if(e.key==='Enter'&&document.getElementById('searchPanel').classList.contains('active'))runSearch();});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&document.getElementById('searchPanel').classList.contains('active'))runSearch();
+  if(e.key==='ArrowRight'&&currentDetailId)navigateDetail(1);
+  if(e.key==='ArrowLeft'&&currentDetailId)navigateDetail(-1);
+});
 </script>
 </body>
 </html>
