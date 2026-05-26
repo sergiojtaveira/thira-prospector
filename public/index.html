@@ -371,7 +371,22 @@ crmList.forEach(function(c){
   if(typeof c.followUpDate==='undefined')c.followUpDate='';
 });
 
-function saveCRM(){localStorage.setItem('thira_crm',JSON.stringify(crmList));updateCRMCount();}
+function syncToServer(){
+  try{
+    fetch('/sync-prospects',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prospects:crmList})
+    });
+  }catch(e){}
+}
+
+function saveCRM(){
+  localStorage.setItem('thira_crm',JSON.stringify(crmList));
+  updateCRMCount();
+  syncToServer();
+}
+
 function updateCRMCount(){document.getElementById('crmCount').textContent=crmList.length;}
 
 function switchTab(tab){
@@ -819,6 +834,7 @@ function refreshAllProspects(){
 }
 
 updateCRMCount();
+syncToServer();
 document.addEventListener('keydown',function(e){
   if(e.key==='Enter'&&document.getElementById('searchPanel').classList.contains('active'))runSearch();
   if(e.key==='ArrowRight'&&currentDetailId)navigateDetail(1);
